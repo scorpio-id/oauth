@@ -1,8 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/scorpio-id/oauth/internal/grants"
+
+	"github.com/gorilla/mux"
+)
 
 func main() {
-	// verifying setup
-	fmt.Print("lie for you, die for you, paint the sky for you")
+	r := mux.NewRouter()
+	r.HandleFunc("/token", grants.ClientCredentialsHandler).Methods(http.MethodPost)
+	http.ListenAndServe(":8081", r)
 }
