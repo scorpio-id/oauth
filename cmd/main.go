@@ -1,15 +1,20 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
-	"github.com/scorpio-id/oauth/internal/grants"
-
-	"github.com/gorilla/mux"
+	"github.com/scorpio-id/oauth/internal/config"
+	"github.com/scorpio-id/oauth/internal/transport"
 )
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/token", grants.ClientCredentialsHandler).Methods(http.MethodPost)
-	http.ListenAndServe(":8081", r)
+	// parse local config (could be added as cmd line arg)
+	cfg := config.NewConfig("internal/config/local.yml")
+
+	// create a new mux router
+	router, _ := transport.NewRouter(cfg)
+
+	// start the server
+	log.Fatal(http.ListenAndServe(":"+cfg.Server.Port, router))
 }

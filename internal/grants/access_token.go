@@ -1,4 +1,4 @@
-package device
+package grants
 
 import (
 	"encoding/json"
