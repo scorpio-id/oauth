@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/scorpio-id/oauth/internal/data"
-	"github.com/scorpio-id/oauth/internal/pkg/oauth"
+	"github.com/scorpio-id/oauth/pkg/oauth"
 )
 
 const (

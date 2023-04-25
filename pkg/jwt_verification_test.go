@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/scorpio-id/oauth/internal/pkg/oauth"
+	"github.com/scorpio-id/oauth/pkg/oauth"
 	"github.com/stretchr/testify/assert"
 )
 

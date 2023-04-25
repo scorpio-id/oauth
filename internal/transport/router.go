@@ -11,7 +11,7 @@ import (
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
-	"github.com/scorpio-id/oauth/internal/pkg/oauth"
+	"github.com/scorpio-id/oauth/pkg/oauth"
 )
 
 // NewRouter creates a new mux router with applied server, oauth, and device grant configurations
