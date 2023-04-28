@@ -13,14 +13,14 @@ import (
 // JWT contains a sample access token minted by this issuer which expires in 2122
 // JWKS is a snapshot of the matching, hosted endpoint with kid value
 const (
-	JWT = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhd" +
-		"WQiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cH" +
-		"M6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk" +
-		"0MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZ" +
-		"A-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT" +
-		"1ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP" +
-		"3rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh" +
-		"8WDw"
+	JWT = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhdW" +
+		"QiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cHM" +
+		"6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk0" +
+		"MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZA" +
+		"-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT1" +
+		"ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP3" +
+		"rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh8" +
+		"WDw"
 	JWKS = `{
     			"keys": [
         			{

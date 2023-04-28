@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -30,7 +31,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
 	issuer := oauth.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
 
-	// FIXME create a device granter
+	// create a granter
 	name = cfg.Server.Host + ":" + cfg.Server.Port
 	minutes, _ := time.ParseDuration("10m")
 	granter := grants.NewGranter(issuer, minutes, 8, name+"/device")
@@ -41,11 +42,8 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host oauth2 JWKS endpoint
 	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
 
-	// TODO - add routes for client_credentials grant
-	// routes specific to RFC 8628 OAuth 2.0 Device Authorization Grant https://www.rfc-editor.org/rfc/rfc8628
-	// router.HandleFunc("/device", granter.RegistrationHandler).Methods(http.MethodPost, http.MethodOptions)
-	// router.HandleFunc("/access_token", granter.AccessTokenHandler).Methods(http.MethodPost, http.MethodOptions)
-	// router.HandleFunc("/device_authorization", granter.AuthorizationHandler).Methods(http.MethodPost, http.MethodOptions)
+	// only adding client credentials grant endpoint for now ...
+	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 
 	return router, &granter
 }

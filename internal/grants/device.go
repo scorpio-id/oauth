@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-// AccessTokenHandler as defined in https://www.rfc-editor.org/rfc/rfc8628#section-3.4
-func (g *Granter) AccessTokenHandler(w http.ResponseWriter, r *http.Request) {
+// DeviceHandler as defined in https://www.rfc-editor.org/rfc/rfc8628#section-3.4
+func (g *Granter) DeviceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 		return
