@@ -78,11 +78,17 @@ func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error
 	// now see if there is a matching public key in the jwks
 	key := jwks.Key(kid)
 
-	valid := jwt.Claims{}
-	err = parsed.Claims(key[0], &valid)
+	claims := jwt.Claims{}
+	err = parsed.Claims(key[0], &claims)
 	if err != nil {
 		return nil, err
 	}
 
-	return &valid, nil
+	// now we actually validate the claims ...
+	err = claims.Validate(jwt.Expected{Issuer: issuer})
+	if err != nil {
+		return nil, err
+	}
+
+	return &claims, nil
 }

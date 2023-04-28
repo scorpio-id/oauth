@@ -33,6 +33,19 @@ const (
         			}
     			]
 			}`
+	EXPJWT = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxMGIwNzI3LTRkMWEtNDNhNi1hZDcxLTM2ODllNjBiOWZjYiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJpbXBvcnRhbnQtcmVzb3VyY2Utc2VydmVyIiwiZXhwIjoxNjgyNzE4MDEyLCJpYXQiOjE2ODI3MTc4OTIsImlzcyI6Imh0dHBzOi8vaWRlbnRpdHkuaW8vandrcyIsImp0aSI6ImY3ZGI4MTQyLWM2NDktNDUyZi04Mjc1LWMxZTc3YjVlM2U1YyIsIm5iZiI6MTY4MjcxNzg4MSwic3ViIjoiZGl2aW5lLWhhemUifQ.UkM4LwN7HhEiMRtRDXXILFPi5Woxew-1bZwcJEpp66OVX8m1gTM5CyrJlcGkJPtqRk_stf5rVqYFpmVQNofbeMfNwpixy9Z9iq1-Ka_qD8lo3aAky1QV2s5mOLi5qhGSZNCl4i7qx6QgtrDYgqgXgcNdmPYhyhjRAE7WeaomsD0B-280YP2XEqEwPAa1GJS-Dha40RtVAyTPBGErOqRu40DU24tEDi1XxIdtdzK46_4j6lYYFbLboq2FgZOJBt9RuuvwFkZN_T3tPNsfjMjcEDJCooENAMVYm8fbLd5jd8HMxeBvifQKYxkQyaMx6Uhls-wU0OGkMM_Avg9Em5DZgw"
+	EXPJWKS = `{
+				"keys": [
+					{
+						"use": "sig",
+						"kty": "RSA",
+						"kid": "510b0727-4d1a-43a6-ad71-3689e60b9fcb",
+						"alg": "RS256",
+						"n": "tmqNCn0EggqsgFDgmQRx595SweDMbq6zTQgg8JUuZSCZokwgPNfUkgHNipjE-JUiiA2kth_-AWpQ4PAD3VRH6ZOL8j6sONlNHJfDn7Nwh2tXXFCGS01GHDRCh_c5ZHiRhLz229YIUxxRbpOI5b9-j3QS6vsd-LC_iL8tNRaN8R2wZjI9elIvda_V3jw7OKN3n1A83Exd_GpmJ4599m8SJTNply9lfnPX8veOspiYRxAbkJmgG5uy-iBIs8X7RC-CKb2fUYEmG7bKNPxpdYysVSwGS716q4EAe8HFHfTR60-5y8uX1qQ7hJkaQJiC8H6mCMXdIh1COJnAmwfeoLhFuQ",
+						"e": "AQAB"
+				}
+			]
+		}`
 )
 
 // TestResourceServerJWTVerification checks if a resource server can verify a jwt minted by this issuer
@@ -55,4 +68,16 @@ func TestResourceServerJWTVerification(t *testing.T) {
 // TestResourceServerExpiredJWT verification fails when given an expired access token
 func TestResourceServerExpiredJWT(t *testing.T) {
 	// TODO - implement ...
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	// register mocked jwks endpoint
+	httpmock.RegisterResponder("GET", "https://identity.io/jwks",
+		httpmock.NewStringResponder(200, EXPJWKS))
+
+	client := http.Client{}
+
+	_, err := oauth.Verify(EXPJWT, "https://identity.io/jwks", client)
+	assert.NotNil(t, err)
+	log.Printf("%v", err)
 }
