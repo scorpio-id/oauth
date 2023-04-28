@@ -13,14 +13,7 @@ import (
 // JWT contains a sample access token minted by this issuer which expires in 2122
 // JWKS is a snapshot of the matching, hosted endpoint with kid value
 const (
-	JWT = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhdW" +
-		"QiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cHM" +
-		"6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk0" +
-		"MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZA" +
-		"-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT1" +
-		"ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP3" +
-		"rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh8" +
-		"WDw"
+	JWT  = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk0MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZA-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT1ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP3rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh8WDw"
 	JWKS = `{
     			"keys": [
         			{
@@ -33,7 +26,8 @@ const (
         			}
     			]
 			}`
-	EXPJWT = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxMGIwNzI3LTRkMWEtNDNhNi1hZDcxLTM2ODllNjBiOWZjYiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJpbXBvcnRhbnQtcmVzb3VyY2Utc2VydmVyIiwiZXhwIjoxNjgyNzE4MDEyLCJpYXQiOjE2ODI3MTc4OTIsImlzcyI6Imh0dHBzOi8vaWRlbnRpdHkuaW8vandrcyIsImp0aSI6ImY3ZGI4MTQyLWM2NDktNDUyZi04Mjc1LWMxZTc3YjVlM2U1YyIsIm5iZiI6MTY4MjcxNzg4MSwic3ViIjoiZGl2aW5lLWhhemUifQ.UkM4LwN7HhEiMRtRDXXILFPi5Woxew-1bZwcJEpp66OVX8m1gTM5CyrJlcGkJPtqRk_stf5rVqYFpmVQNofbeMfNwpixy9Z9iq1-Ka_qD8lo3aAky1QV2s5mOLi5qhGSZNCl4i7qx6QgtrDYgqgXgcNdmPYhyhjRAE7WeaomsD0B-280YP2XEqEwPAa1GJS-Dha40RtVAyTPBGErOqRu40DU24tEDi1XxIdtdzK46_4j6lYYFbLboq2FgZOJBt9RuuvwFkZN_T3tPNsfjMjcEDJCooENAMVYm8fbLd5jd8HMxeBvifQKYxkQyaMx6Uhls-wU0OGkMM_Avg9Em5DZgw"
+
+	EXPJWT  = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjUxMGIwNzI3LTRkMWEtNDNhNi1hZDcxLTM2ODllNjBiOWZjYiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJpbXBvcnRhbnQtcmVzb3VyY2Utc2VydmVyIiwiZXhwIjoxNjgyNzE4MDEyLCJpYXQiOjE2ODI3MTc4OTIsImlzcyI6Imh0dHBzOi8vaWRlbnRpdHkuaW8vandrcyIsImp0aSI6ImY3ZGI4MTQyLWM2NDktNDUyZi04Mjc1LWMxZTc3YjVlM2U1YyIsIm5iZiI6MTY4MjcxNzg4MSwic3ViIjoiZGl2aW5lLWhhemUifQ.UkM4LwN7HhEiMRtRDXXILFPi5Woxew-1bZwcJEpp66OVX8m1gTM5CyrJlcGkJPtqRk_stf5rVqYFpmVQNofbeMfNwpixy9Z9iq1-Ka_qD8lo3aAky1QV2s5mOLi5qhGSZNCl4i7qx6QgtrDYgqgXgcNdmPYhyhjRAE7WeaomsD0B-280YP2XEqEwPAa1GJS-Dha40RtVAyTPBGErOqRu40DU24tEDi1XxIdtdzK46_4j6lYYFbLboq2FgZOJBt9RuuvwFkZN_T3tPNsfjMjcEDJCooENAMVYm8fbLd5jd8HMxeBvifQKYxkQyaMx6Uhls-wU0OGkMM_Avg9Em5DZgw"
 	EXPJWKS = `{
 				"keys": [
 					{
@@ -79,5 +73,6 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 
 	_, err := oauth.Verify(EXPJWT, "https://identity.io/jwks", client)
 	assert.NotNil(t, err)
+
 	log.Printf("%v", err)
 }
