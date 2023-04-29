@@ -37,9 +37,9 @@ const (
 						"alg": "RS256",
 						"n": "tmqNCn0EggqsgFDgmQRx595SweDMbq6zTQgg8JUuZSCZokwgPNfUkgHNipjE-JUiiA2kth_-AWpQ4PAD3VRH6ZOL8j6sONlNHJfDn7Nwh2tXXFCGS01GHDRCh_c5ZHiRhLz229YIUxxRbpOI5b9-j3QS6vsd-LC_iL8tNRaN8R2wZjI9elIvda_V3jw7OKN3n1A83Exd_GpmJ4599m8SJTNply9lfnPX8veOspiYRxAbkJmgG5uy-iBIs8X7RC-CKb2fUYEmG7bKNPxpdYysVSwGS716q4EAe8HFHfTR60-5y8uX1qQ7hJkaQJiC8H6mCMXdIh1COJnAmwfeoLhFuQ",
 						"e": "AQAB"
-				}
-			]
-		}`
+					}
+				]
+			}`
 )
 
 // TestResourceServerJWTVerification checks if a resource server can verify a jwt minted by this issuer
@@ -75,4 +75,9 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 	assert.NotNil(t, err)
 
 	log.Printf("%v", err)
+}
+
+// TestResourceServerWrongJWKS verification fails when using a mismatched JWKS
+func TestResourceServerWrongJWKS(t *testing.T) {
+	// TODO - implement ...
 }
