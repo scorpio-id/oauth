@@ -44,6 +44,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	// only adding client credentials grant endpoint for now ...
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
 
 	return router, &granter
 }
