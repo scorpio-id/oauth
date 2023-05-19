@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-jose/go-jose/v3"
@@ -76,7 +77,11 @@ func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error
 	kid := parsed.Headers[0].KeyID
 
 	// now see if there is a matching public key in the jwks
+	// check if key is null and return err
 	key := jwks.Key(kid)
+	if key == nil {
+		return nil, errors.New(fmt.Sprintf("jwt verification failed, no such kid: [%v]", kid))
+	}
 
 	claims := jwt.Claims{}
 	err = parsed.Claims(key[0], &claims)
