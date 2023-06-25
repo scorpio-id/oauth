@@ -8,18 +8,19 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"net/http/httputil"
 	"testing"
 	"time"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/pkg/oauth"
-	"github.com/stretchr/testify/assert"
 )
 
 // TestAuthorizationCodeGrant produces JWT via authorization code grant flow (link to rfc)
 func TestAuthorizationCodeGrant(t *testing.T) {
 	// TODO - test authorization code grant flow ...
+	logger := log.Default()
+
 	cfg := config.NewConfig("../config/test.yml")
 
 	// generate an RSA key pair
@@ -36,81 +37,78 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 	// create a granter
 	name = cfg.Server.Host + ":" + cfg.Server.Port
 	minutes, _ := time.ParseDuration("10m")
-	granter := NewGranter(issuer, minutes, 8, name+"/device")
+	granter := NewGranter(issuer, minutes, 8, name)
 
-	server := httptest.NewServer(http.HandlerFunc(granter.AuthorizationCodeHandler))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/authorize", granter.AuthorizationCodeHandler)
+	mux.HandleFunc("/jwt", granter.AuthorizationTokenHandler)
+
+	server := httptest.NewServer(mux)
 	defer server.Close()
 
-	// TODO - implement client portion of authorization code grant!
+	rserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestDump, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			logger.Println(err)
+		}
 
-	client := http.Client{
-		// Client Auto Follows Redirects but we want the redirecturi
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}}
+		logger.Println(string(requestDump))
 
-	// ex step 1: GET http://localhost:8081/authorize?client_id=friday&response_type=code&redirect_uri=https://client.example.io
+		q := r.URL.Query()
+		code := q["code"][0] // Grabs the first code given back
+		logger.Println("auth code: " + code)
 
+		w.Header().Add("code", code)
+		w.WriteHeader(200)
+	}))
+
+	defer rserver.Close()
+
+	client := http.Client{}
 	client_id := "friday"
-	redirect_url := "https://client.example.io"
 
-	authCodeEndpoint := fmt.Sprintf("%v/authorize?client_id=%v&response_type=code&redirect_uri=%v", server.URL, client_id, redirect_url)
+	authCodeEndpoint := fmt.Sprintf("%v/authorize?client_id=%v&response_type=code&redirect_uri=%v", server.URL, client_id, rserver.URL)
+	// logger.Println("auth code endpoint: " + authCodeEndpoint)
 
 	getReq, err := http.NewRequest("GET", authCodeEndpoint, nil)
-	if err != nil{
+	if err != nil {
 		log.Printf("%v", err)
 	}
 
 	getReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.Do(getReq)
-	if  err != nil{
+	if err != nil {
 		log.Printf("%v", err)
 	}
 
-	// Makes sure response is a redirect
-	assert.True(t, resp.StatusCode == 302)
+	logger.Printf("get status code: [%v]", resp.StatusCode)
 
-	redirectUri, err := resp.Location()
-	if  err != nil{
-		log.Printf("%v", err)
-	}
+	code := resp.Header.Get("code")
 
-	// Extracting url code parameter
-	u, err := url.Parse(redirectUri.String())
-	if  err != nil{
-		log.Printf("%v", err)
-	}
-
-	q := u.Query()
-	authCode := q["code"][0] // Grabs the first code given back
-
-	// ex step 2: POST http://localhost:8081/jwt?grant_type=authorization_code&client_id=friday&code=7deced1b-edac-439d-b990-c6cee1df8fd2&redirect_uri=https://client.example.io
-
-	// ------ AUTHORIZATION ------
-
-	jwtEndpoint := fmt.Sprintf("%v/jwt?grant_type=authorization_code&client_id=%v&code=%v&response_type=code&redirect_uri=%v", server.URL, client_id, authCode, redirect_url)
+	jwtEndpoint := fmt.Sprintf("%v/jwt?grant_type=authorization_code&client_id=%v&code=%v&response_type=code&redirect_uri=%v", server.URL, client_id, code, rserver.URL)
+	logger.Println("jwt endpoint: " + jwtEndpoint)
 
 	postReq, err := http.NewRequest("POST", jwtEndpoint, nil)
-	if err != nil{
+	if err != nil {
 		log.Printf("%v", err)
 	}
 
 	postReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err = client.Do(postReq)
-	if  err != nil{
+	if err != nil {
 		log.Printf("%v", err)
 	}
+
+	logger.Println("status code: " + resp.Status)
 
 	body, err := io.ReadAll(resp.Body)
-	if  err != nil{
+	if err != nil {
 		log.Printf("%v", err)
 	}
+
 	defer resp.Body.Close()
 
-	// GOING TO REDIRECT URI FOR SOME REASON
-
-	fmt.Printf("%v",body)
-
+	logger.Printf("response body: %v", string(body))
 }
