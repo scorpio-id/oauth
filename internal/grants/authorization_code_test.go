@@ -8,19 +8,16 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"net/http/httputil"
 	"testing"
 	"time"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/pkg/oauth"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestAuthorizationCodeGrant produces JWT via authorization code grant flow (link to rfc)
 func TestAuthorizationCodeGrant(t *testing.T) {
-	// TODO - test authorization code grant flow ...
-	logger := log.Default()
-
 	cfg := config.NewConfig("../config/test.yml")
 
 	// generate an RSA key pair
@@ -47,21 +44,12 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 	defer server.Close()
 
 	rserver := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestDump, err := httputil.DumpRequest(r, true)
-		if err != nil {
-			logger.Println(err)
-		}
-
-		logger.Println(string(requestDump))
-
 		q := r.URL.Query()
 		code := q["code"][0] // Grabs the first code given back
-		logger.Println("auth code: " + code)
 
 		w.Header().Add("code", code)
 		w.WriteHeader(200)
 	}))
-
 	defer rserver.Close()
 
 	client := http.Client{}
@@ -82,12 +70,9 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 		log.Printf("%v", err)
 	}
 
-	logger.Printf("get status code: [%v]", resp.StatusCode)
-
 	code := resp.Header.Get("code")
 
 	jwtEndpoint := fmt.Sprintf("%v/jwt?grant_type=authorization_code&client_id=%v&code=%v&response_type=code&redirect_uri=%v", server.URL, client_id, code, rserver.URL)
-	logger.Println("jwt endpoint: " + jwtEndpoint)
 
 	postReq, err := http.NewRequest("POST", jwtEndpoint, nil)
 	if err != nil {
@@ -101,14 +86,13 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 		log.Printf("%v", err)
 	}
 
-	logger.Println("status code: " + resp.Status)
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("%v", err)
 	}
-
 	defer resp.Body.Close()
 
-	logger.Printf("response body: %v", string(body))
+	// FIXME - when jet structure implemented, check custom claims
+	// TODO - masrshal access token response and get jwt from access_token field
+	assert.NotNil(t, body)
 }
