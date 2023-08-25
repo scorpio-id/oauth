@@ -92,7 +92,7 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	// FIXME - when jet structure implemented, check custom claims
-	// TODO - masrshal access token response and get jwt from access_token field
+	// FIXME - when jwt structure implemented, check custom claims
+	// TODO - marshal access token response and get jwt from access_token field
 	assert.NotNil(t, body)
 }
