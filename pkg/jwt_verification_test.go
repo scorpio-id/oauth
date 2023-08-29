@@ -80,4 +80,17 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 // TestResourceServerWrongJWKS verification fails when using a mismatched JWKS
 func TestResourceServerWrongJWKS(t *testing.T) {
 	// TODO - implement ...
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	// register mocked jwks endpoint
+	httpmock.RegisterResponder("GET", "https://identity.io/jwks",
+		httpmock.NewStringResponder(200, EXPJWKS))
+
+	client := http.Client{}
+
+	_, err := oauth.Verify(JWT, "https://identity.io/jwks", client)
+	assert.NotNil(t, err)
+
+	log.Printf("%v", err)
 }
