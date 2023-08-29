@@ -77,9 +77,10 @@ func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error
 	kid := parsed.Headers[0].KeyID
 
 	// now see if there is a matching public key in the jwks
+	// check if key is null and return err
 	key := jwks.Key(kid)
 	if key == nil {
-		return nil, errors.New(fmt.Sprintf("verification failed: no such kid [%v]", kid))
+		return nil, errors.New(fmt.Sprintf("jwt verification failed, no such kid: [%v]", kid))
 	}
 
 	claims := jwt.Claims{}

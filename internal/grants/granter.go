@@ -38,15 +38,17 @@ func NewGranter(issuer oauth.SimpleIssuer, ttl time.Duration, length int, uri st
 	}
 }
 
+// TODO - implement separate types of interactions for different grants
 // CreateInteraction records grant information provided to clients & users by client id
 func (g *Granter) CreateInteraction(clientID string) data.Interaction {
 	expires := time.Unix(time.Now().Unix()+int64(g.CodeTTL.Seconds()), 0)
 
 	i := data.Interaction{
-		ClientID:   clientID,
-		DeviceCode: g.generateDeviceCode(),
-		UserCode:   g.generateUserCode(),
-		Expires:    expires,
+		ClientID:          clientID,
+		AuthorizationCode: uuid.New().String(),
+		DeviceCode:        g.generateDeviceCode(),
+		UserCode:          g.generateUserCode(),
+		Expires:           expires,
 	}
 
 	g.InteractionStore.Add(i)
@@ -75,6 +77,18 @@ func (g *Granter) AuthorizeDevice(userCode string) error {
 	// add device to trusted store
 	g.TrustedDeviceStore.AddDevice(d)
 
+	return nil
+}
+
+// AuthorizeClient checks for unexpired interaction given a clientID and authorization code
+func (g *Granter) AuthorizeClient(client string, code string) error {
+	i, err := g.InteractionStore.RetrieveAuthorization(client, code)
+	if err != nil {
+		return err
+	}
+
+	// delete one-time interaction
+	g.InteractionStore.Delete(i.(data.Interaction))
 	return nil
 }
 

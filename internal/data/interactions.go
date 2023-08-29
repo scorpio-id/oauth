@@ -8,10 +8,11 @@ import (
 
 // Interaction stores information generated during grant flows
 type Interaction struct {
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Expires    time.Time
+	ClientID          string
+	AuthorizationCode string
+	DeviceCode        string
+	UserCode          string
+	Expires           time.Time
 }
 
 func (i *Interaction) IsExpired() bool {
@@ -58,6 +59,20 @@ func (s *InteractionStore) Retrieve(userCode string) (interface{}, error) {
 
 	for _, v := range s.Interactions {
 		if v.UserCode == userCode && !v.IsExpired() {
+			return v, nil
+		}
+	}
+
+	return nil, errors.New("no such interaction")
+}
+
+// Retrieve attempts to return an unexpired interaction given a user_code
+func (s *InteractionStore) RetrieveAuthorization(client string, code string) (interface{}, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, v := range s.Interactions {
+		if v.AuthorizationCode == code && v.ClientID == client && !v.IsExpired() {
 			return v, nil
 		}
 	}
