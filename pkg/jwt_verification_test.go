@@ -79,7 +79,6 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 
 // TestResourceServerWrongJWKS verification fails when using a mismatched JWKS
 func TestResourceServerWrongJWKS(t *testing.T) {
-	// TODO - implement ...
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
