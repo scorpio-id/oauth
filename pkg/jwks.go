@@ -1,4 +1,4 @@
-package oauth
+package pkg
 
 import (
 	"crypto/rsa"

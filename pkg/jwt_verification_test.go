@@ -6,14 +6,13 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	"github.com/scorpio-id/oauth/pkg/oauth"
 	"github.com/stretchr/testify/assert"
 )
 
 // JWT contains a sample access token minted by this issuer which expires in 2122
 // JWKS is a snapshot of the matching, hosted endpoint with kid value
 const (
-	JWT  = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk0MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZA-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT1ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP3rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh8WDw"
+	TESTJWT  = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NDVjNmU0LTZkN2UtNGFmYS1hZmI0LTlkMWUzYzlmZDE5NSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaW1wb3J0YW50LXJlc291cmNlLXNlcnZlciJdLCJleHAiOjQ4MTg1OTQ0MjAsImlhdCI6MTY2NDk5NDQyMCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS5pby9qd2tzIiwianRpIjoiMWYwNDY4ZGEtZGIzNC00MTY2LTk4ZDEtOWQ2ZTRiMzkwNzYzIiwibmJmIjoxNjY0OTk0MzY1LCJzdWIiOiJzbm93eS1zdGFyI2ExYTdmNDFiLWIxNWQtNDkzZi05MmQ0LTM5M2Y3MDUyYWQ4NSJ9.s0IRt6uOLhIeuLi7UdjItsZA-8EFuIOE2VQBNHApcrqAMPjjoEod2yawtAg41zjIJo8vHUoLDcw9TIs0R9ghKNq1Y1fEbzhxcE8N5oYgG-zcZcudsGaMxKdkLXF7qPKT1ue7xwmSssVJHSSer5iw_hRY4B8OlejCnycuIZbhUEYyZfvJ1E7x_VHDVFMbKdAoOrFkwNSt8My4-DBmjRu6F8MIFlfHvur3wV8GFoqRP3rJtrjHwsJoEBk6pK1x3OgiZ7EozL5ITRFak8ShtJo9Pq-BV7sE-s9lZz--ta_AKfOvrI-m-j451BvwqHIaTwCrp1yvFskqxQWjWauArh8WDw"
 	JWKS = `{
     			"keys": [
         			{
@@ -53,7 +52,7 @@ func TestResourceServerJWTVerification(t *testing.T) {
 
 	client := http.Client{}
 
-	claims, err := oauth.Verify(JWT, "https://identity.io/jwks", client)
+	claims, err := Verify(TESTJWT, "https://identity.io/jwks", client)
 	assert.Nil(t, err)
 
 	log.Printf("issuer: %v, audience: %v, subject: %v", claims.Issuer, claims.Audience, claims.Subject)
@@ -71,7 +70,7 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 
 	client := http.Client{}
 
-	_, err := oauth.Verify(EXPJWT, "https://identity.io/jwks", client)
+	_, err := Verify(EXPJWT, "https://identity.io/jwks", client)
 	assert.NotNil(t, err)
 
 	log.Printf("%v", err)
@@ -88,7 +87,7 @@ func TestResourceServerWrongJWKS(t *testing.T) {
 
 	client := http.Client{}
 
-	_, err := oauth.Verify(JWT, "https://identity.io/jwks", client)
+	_, err := Verify(TESTJWT, "https://identity.io/jwks", client)
 	assert.NotNil(t, err)
 
 	log.Printf("%v", err)

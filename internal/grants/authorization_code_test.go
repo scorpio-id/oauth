@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/scorpio-id/oauth/internal/config"
-	"github.com/scorpio-id/oauth/pkg/oauth"
+	"github.com/scorpio-id/oauth/pkg"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +29,7 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 	// create issuer for testing purposes
 	name := cfg.OAuth.Issuer
 	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
-	issuer := oauth.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
+	issuer := pkg.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
 
 	// create a granter
 	name = cfg.Server.Host + ":" + cfg.Server.Port

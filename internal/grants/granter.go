@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/scorpio-id/oauth/internal/data"
-	"github.com/scorpio-id/oauth/pkg/oauth"
+	"github.com/scorpio-id/oauth/pkg"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 
 // Granter takes an issuer, datastores, code ttl configuration, and JWT
 type Granter struct {
-	Issuer             oauth.SimpleIssuer
+	Issuer             pkg.SimpleIssuer
 	ClientStore        data.ClientStore
 	InteractionStore   data.InteractionStore
 	TrustedDeviceStore data.TrustedDeviceStore
@@ -26,7 +26,7 @@ type Granter struct {
 	UserCodeLength     int
 }
 
-func NewGranter(issuer oauth.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
+func NewGranter(issuer pkg.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
 	return Granter{
 		Issuer:           issuer,
 		ClientStore:      data.NewClientStore(),
