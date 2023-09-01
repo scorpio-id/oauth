@@ -52,7 +52,7 @@ func TestResourceServerJWTVerification(t *testing.T) {
 
 	client := http.Client{}
 
-	claims, err := Verify(TESTJWT, "https://identity.io/jwks", client)
+	claims, err := Verify(TESTJWT, []string{"https://identity.io/jwks"}, client)
 	assert.Nil(t, err)
 
 	log.Printf("issuer: %v, audience: %v, subject: %v", claims.Issuer, claims.Audience, claims.Subject)
@@ -70,7 +70,7 @@ func TestResourceServerExpiredJWT(t *testing.T) {
 
 	client := http.Client{}
 
-	_, err := Verify(EXPJWT, "https://identity.io/jwks", client)
+	_, err := Verify(EXPJWT, []string{"https://identity.io/jwks"}, client)
 	assert.NotNil(t, err)
 
 	log.Printf("%v", err)
@@ -87,7 +87,7 @@ func TestResourceServerWrongJWKS(t *testing.T) {
 
 	client := http.Client{}
 
-	_, err := Verify(TESTJWT, "https://identity.io/jwks", client)
+	_, err := Verify(TESTJWT, []string{"https://identity.io/jwks"}, client)
 	assert.NotNil(t, err)
 
 	log.Printf("%v", err)

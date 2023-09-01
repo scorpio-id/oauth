@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/jwt"
+	"golang.org/x/exp/slices"
 )
 
 const (
@@ -41,7 +42,7 @@ func NewSigner(private *rsa.PrivateKey, kid string) (jose.Signer, error) {
 // Verify is used by resource servers to validate a jwt by retrieving a jwks from the 'iss' claim.
 // the provided issuer string is considered a trusted issuer which we expect to see
 // the client is any preferred http client
-func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error) {
+func Verify(token string, issuers []string, client http.Client) (*jwt.Claims, error) {
 	// start by decoding the jwt
 	parsed, err := jwt.ParseSigned(token)
 	if err != nil {
@@ -55,13 +56,16 @@ func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error
 		return nil, err
 	}
 
-	// check to see if issuer matches our expectation
-	if unsafe.Issuer != issuer {
+	// check to see if unsafe issuer is included in trusted issuers slice
+	if !slices.Contains(issuers, unsafe.Issuer) {
 		return nil, errors.New("issuer is untrusted")
 	}
 
+	// update name being that the issuer is included in the trusted sources
+	trusted := unsafe.Issuer
+
 	// let's now fetch the jwks, we assume that the 'iss' claim is a fqdn
-	response, err := client.Get(issuer)
+	response, err := client.Get(trusted)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +94,7 @@ func Verify(token string, issuer string, client http.Client) (*jwt.Claims, error
 	}
 
 	// now we actually validate the claims ...
-	err = claims.Validate(jwt.Expected{Issuer: issuer})
+	err = claims.Validate(jwt.Expected{Issuer: trusted})
 	if err != nil {
 		return nil, err
 	}
