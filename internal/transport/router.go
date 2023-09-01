@@ -11,7 +11,7 @@ import (
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
-	"github.com/scorpio-id/oauth/pkg"
+	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
 // NewRouter creates a new mux router with applied server, oauth, and device grant configurations
@@ -29,7 +29,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// we are using plain http here strictly for example purposes
 	name := cfg.OAuth.Issuer
 	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
-	issuer := pkg.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
+	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
 
 	// create a granter
 	name = cfg.Server.Host + ":" + cfg.Server.Port
