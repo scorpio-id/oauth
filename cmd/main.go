@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	// parse local config (could be added as cmd line arg)
+	// parse local config
 	cfg := config.NewConfig("internal/config/local.yml")
 
 	// create a new mux router
