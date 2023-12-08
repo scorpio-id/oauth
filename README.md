@@ -1,3 +1,42 @@
+JWKS
+RFC: https://datatracker.ietf.org/doc/html/rfc7517#section-5
+
+GET /jwks 
+
+HTTP 200 OK
+Content-Type: application/json
+
+{
+    "keys": [
+        {
+            "use": "sig",
+            "kty": "RSA",
+            "kid": "b83e7eda-d7fa-4c81-8ddf-7bf4480baa35",
+            "alg": "RS256",
+            "n": "6zM13c6IZlvN3 ... ug64DCTRhWlHcBiCq71CMyFw",
+            "e": "AQAB"
+        }
+    ]
+}
+
+Client Credentials
+RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+
+POST /token
+Content-Type: application/x-www-form-urlencoded
+
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| grant_type     | client_credentials |  Required Per RFC6749 |
+| client_id      | string             |  Client Identifier    | 
+
+
+
+
+
+
+
+
 # Oauth2: The Industry Standard for user authorization
 ## What is Oauth2?
 
