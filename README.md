@@ -1,10 +1,15 @@
 JWKS
 RFC: https://datatracker.ietf.org/doc/html/rfc7517#section-5
 
+# Request
+```http
 GET /jwks 
-
+```
+# Response
+```http
 HTTP 200 OK
 Content-Type: application/json
+```
 
 ```json
 {
@@ -62,7 +67,7 @@ Content-Type: application/x-www-form-urlencoded
 | Form Parameter | Value | Description | 
 | -------------- | ----- | ----------- | 
 | grant_type     | authorization_code  | Required RFC6749 |
-| code           | authorization code UUID | Authorization Code Sent to Redirect URI |
+| code           | uuid | Authorization Code Sent to Redirect URI |
 | redirect_uri   | string | Original Redirect URI |
 | client_id      | string | Client Identifier |
 
