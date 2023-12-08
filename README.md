@@ -6,6 +6,7 @@ GET /jwks
 HTTP 200 OK
 Content-Type: application/json
 
+```json
 {
     "keys": [
         {
@@ -18,6 +19,7 @@ Content-Type: application/json
         }
     ]
 }
+```
 
 Client Credentials
 RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
@@ -27,8 +29,53 @@ Content-Type: application/x-www-form-urlencoded
 
 | Form Parameter | Value | Description | 
 | -------------- | ----- | ----------- | 
-| grant_type     | client_credentials |  Required Per RFC6749 |
+| grant_type     | client_credentials |  Required RFC6749 |
 | client_id      | string             |  Client Identifier    | 
+
+HTTP 200 OK
+Content-Type: application/json
+
+{
+    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+
+Authorizatiion Code Grant 
+RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
+
+GET /authorize
+Content-Type: application/x-www-form-urlencoded
+
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| response_type  | code  | Required RFC6749 |
+| client_id      | string | Client Identifier |
+| redirect_uri   | string | URI Location of Recipient for Authorization Code |
+
+HTTP 302 Found
+Location: https://my.redirect/uri?code=cc496de4-9616-11ee-b9d1-0242ac120002 
+
+POST /jwt 
+Content-Type: application/x-www-form-urlencoded
+
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| grant_type     | authorization_code  | Required RFC6749 |
+| code           | authorization code UUID | Authorization Code Sent to Redirect URI |
+| redirect_uri   | string | Original Redirect URI |
+| client_id      | string | Client Identifier |
+
+HTTP 200 OK
+Content-Type: application/json
+
+{
+    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+
+
 
 
 
