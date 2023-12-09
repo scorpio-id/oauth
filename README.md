@@ -11,6 +11,8 @@ Oauth enables the user to grant access to their resources without sharing their 
 
 ## Roles, Concepts, and Terminology
 
+More info on Oauth2 roles, concepts, and terminology can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-1 
+
 The framework of Oauth2 has various roles, concepts, and components at play in order to enable secure delegated authorization. These include: 
 
 | Term | Description | 
@@ -21,7 +23,6 @@ The framework of Oauth2 has various roles, concepts, and components at play in o
 | Resource Server | The server hosting the end-user's protected resources. Accepts and responds to request using access tokens |
 | Scopes | The specific reason for desired access by the client | 
 | Access Token | Typically seen in JWT format (JSON Web Token), the Access Token is used by the client to access the user's data stored in the resource server | 
-
 
 # JWKS (JSON Web Key Set)
 
