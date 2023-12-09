@@ -1,94 +1,3 @@
-JWKS
-RFC: https://datatracker.ietf.org/doc/html/rfc7517#section-5
-
-# Request
-```http
-GET /jwks 
-```
-# Response
-```http
-HTTP 200 OK
-Content-Type: application/json
-```
-
-```json
-{
-    "keys": [
-        {
-            "use": "sig",
-            "kty": "RSA",
-            "kid": "b83e7eda-d7fa-4c81-8ddf-7bf4480baa35",
-            "alg": "RS256",
-            "n": "6zM13c6IZlvN3 ... ug64DCTRhWlHcBiCq71CMyFw",
-            "e": "AQAB"
-        }
-    ]
-}
-```
-
-Client Credentials
-RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
-
-POST /token
-Content-Type: application/x-www-form-urlencoded
-
-| Form Parameter | Value | Description | 
-| -------------- | ----- | ----------- | 
-| grant_type     | client_credentials |  Required RFC6749 |
-| client_id      | string             |  Client Identifier    | 
-
-HTTP 200 OK
-Content-Type: application/json
-
-{
-    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
-    "token_type": "bearer",
-    "expires_in": 3600
-}
-
-Authorizatiion Code Grant 
-RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
-
-GET /authorize
-Content-Type: application/x-www-form-urlencoded
-
-| Form Parameter | Value | Description | 
-| -------------- | ----- | ----------- | 
-| response_type  | code  | Required RFC6749 |
-| client_id      | string | Client Identifier |
-| redirect_uri   | string | URI Location of Recipient for Authorization Code |
-
-HTTP 302 Found
-Location: https://my.redirect/uri?code=cc496de4-9616-11ee-b9d1-0242ac120002 
-
-POST /jwt 
-Content-Type: application/x-www-form-urlencoded
-
-| Form Parameter | Value | Description | 
-| -------------- | ----- | ----------- | 
-| grant_type     | authorization_code  | Required RFC6749 |
-| code           | uuid | Authorization Code Sent to Redirect URI |
-| redirect_uri   | string | Original Redirect URI |
-| client_id      | string | Client Identifier |
-
-HTTP 200 OK
-Content-Type: application/json
-
-{
-    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
-    "token_type": "bearer",
-    "expires_in": 3600
-}
-
-
-
-
-
-
-
-
-
-
 # Oauth2: The Industry Standard for user authorization
 ## What is Oauth2?
 
@@ -118,13 +27,115 @@ The framework of Oauth2 has various roles, concepts, and components at play in o
 
 -Access Token: Typically seen in a JWT format, or Json Web Token format, this is the key to the data that is stored in the resource server. The Authorization Code Grant enables the client to obtain a JWT.
 
-## Basic Authorization Code Flow of Oauth2
 
-At the basic level before using Oauth2, the client must obtain its own credentials that include a client ID and a client secret. The ID will be shared but the secret is to not be shared. This will enable the client to authenticate itself when requesting an access token in the later part of the flow. 
 
-A basic flow in Oauth2 involves the authorization code grant. First, the resource owner initiates the flow by visiting the client site and redirects to the authorization server. A redirect URI is provided in this process. The resource owner logs into the authorization server and then redirects back to the redirect URI with the authorization code. The client then presents the authorization code to the authorization server in exchange for an access token. If an access token is granted, the client then contacts the resource server with a request. The request contains the access token granted by the authorization server, allowing the client to gain access to the resource owner's data. 
+# JWKS (JSON Web Key Set)
 
-The access token is typically seen in a JSON Web Token format. This format involves symetric and asymetric encryption, allowing the token to be transported over the web securely
+More info on JWKS and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc7517#section-5
+
+### Request
+```http
+GET /jwks 
+```
+### Response
+```http
+HTTP 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+    "keys": [
+        {
+            "use": "sig",
+            "kty": "RSA",
+            "kid": "b83e7eda-d7fa-4c81-8ddf-7bf4480baa35",
+            "alg": "RS256",
+            "n": "6zM13c6IZlvN3 ... ug64DCTRhWlHcBiCq71CMyFw",
+            "e": "AQAB"
+        }
+    ]
+}
+```
+
+# Grants/Flows
+## Client Credentials
+More info on Client Credentials and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
+
+### Request
+```http
+POST /token
+Content-Type: application/x-www-form-urlencoded
+```
+### Parameters
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| grant_type     | client_credentials |  Required RFC6749 |
+| client_id      | string             |  Client Identifier    | 
+
+### Response
+```http
+HTTP 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+```
+
+## Authorizatiion Code Grant 
+More info on Authorization Code Grant and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
+
+### Request
+```http
+GET /authorize
+Content-Type: application/x-www-form-urlencoded
+```
+
+### Parameters
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| response_type  | code  | Required RFC6749 |
+| client_id      | string | Client Identifier |
+| redirect_uri   | string | URI Location of Recipient for Authorization Code |
+
+### Response 
+```http
+HTTP 302 Found
+Location: https://my.redirect/uri?code=cc496de4-9616-11ee-b9d1-0242ac120002 
+```
+
+### Request
+```http
+POST /jwt 
+Content-Type: application/x-www-form-urlencoded
+```
+
+### Parameters
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| grant_type     | authorization_code  | Required RFC6749 |
+| code           | uuid | Authorization Code Sent to Redirect URI |
+| redirect_uri   | string | Original Redirect URI |
+| client_id      | string | Client Identifier |
+
+### Response
+```http
+HTTP 200 OK
+Content-Type: application/json
+```
+
+```json
+{
+    "access_token": "eyJhbGciOiJSUz ... ImtpZ8nBKeziYH0f71w",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+```
 
 
 
