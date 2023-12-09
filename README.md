@@ -13,6 +13,16 @@ Oauth enables the user to grant access to their resources without sharing their 
 
 The framework of Oauth2 has various roles, concepts, and components at play in order to enable secure delegated authorization. These include: 
 
+| Term | Description | 
+| ---- | ----------- | 
+|Resource Owner | end-user, capable of granting access to their protected resource | 
+
+
+
+
+
+
+
 -Resource Ownner: The User
 
 -Client: The application seeking the data.
