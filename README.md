@@ -15,28 +15,12 @@ The framework of Oauth2 has various roles, concepts, and components at play in o
 
 | Term | Description | 
 | ---- | ----------- | 
-|Resource Owner | end-user, capable of granting access to their protected resource | 
-
-
-
-
-
-
-
--Resource Ownner: The User
-
--Client: The application seeking the data.
-
--Authorization Server: The system used to authorize permission.
-
--Resource Server: AKA API; the system that holds the data the Client wants access to.
-
--Scopes: The specific reason stated for wanting access to resources by the client.
-
--Authorization Code Grant: Proof that the user has given the client permission to gain access to the data. 
-
--Access Token: Typically seen in a JWT format, or Json Web Token format, this is the key to the data that is stored in the resource server. The Authorization Code Grant enables the client to obtain a JWT.
-
+| Resource Owner | end-user, capable of granting access to their protected resource | 
+| Client | The application (server, desktop, etc.) requesting access to the user's protected resource with its authorization |
+| Authorization Server | The server responsible for authorizing permission for the client in the form of access token grants | 
+| Resource Server | The server hosting the end-user's protected resources. Accepts and responds to request using access tokens |
+| Scopes | The specific reason for desired access by the client | 
+| Access Token | Typically seen in JWT format (JSON Web Token), the Access Token is used by the client to access the user's data stored in the resource server | 
 
 
 # JWKS (JSON Web Key Set)
