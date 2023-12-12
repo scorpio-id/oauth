@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/swaggo/http-swagger/v2"
+	_ "github.com/scorpio-id/oauth/cmd/docs"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
@@ -39,6 +41,14 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// create gorilla mux router
 	router := mux.NewRouter()
 
+	// adding swagger 
+	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:" + cfg.Server.Port + "/swagger/doc.json"),
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("swagger-ui"),
+	)).Methods(http.MethodGet)
+
 	// host oauth2 JWKS endpoint
 	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
 
@@ -49,3 +59,4 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	return router, &granter
 }
+
