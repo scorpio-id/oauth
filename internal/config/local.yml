@@ -1,0 +1,12 @@
+# server configurations
+server:
+  host: "http://127.0.0.1"
+  port: 8082
+
+# oauth configurations
+oauth:
+  rsa_bits: 2048
+  audience: "important-resource-server"
+  issuer: "http://localhost:8082"
+  jwt_ttl: "60m"
+  jwks: "/jwks"
