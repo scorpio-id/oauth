@@ -26,6 +26,8 @@ The framework of Oauth2 has various roles, concepts, and components at play in o
 
 # JWKS (JSON Web Key Set)
 
+JWKS, or JSON Web Key Set, is a set of keys containing the public keys used to identify any JSON Web Token (JWT) that is issued by the authorization server. Signed using the RS256 algorithm.
+
 More info on JWKS and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc7517#section-5
 
 ### Request
@@ -55,6 +57,8 @@ Content-Type: application/json
 
 # Grants/Flows
 ## Client Credentials
+The client credentials grant type is a grant flow where the client may request an access token using only their set of credentials. This is typically in the form of a client_id. Without a client_id, an access token will not granted by the authorization server.
+
 More info on Client Credentials and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.4
 
 ### Request
@@ -83,7 +87,9 @@ Content-Type: application/json
 ```
 
 ## Authorizatiion Code Grant 
-More info on Authorization Code Grant and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
+The authorization code grant is a flow in which the client application will request an authorization code from the authorization server and use the given code along with other parameters to receive an access token. The access token will be used to access the data in the user's resource server.
+
+More info on Authorization Code Grant and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1
 
 ### Request
 ```http
@@ -131,6 +137,27 @@ Content-Type: application/json
     "expires_in": 3600
 }
 ```
+
+### JWT.io Parameters Example
+
+JWT.io allows you to decode, verify, and generate a JWT, or JSON Web Token. For the JWT template to paste your own access tokens into, visit: https://jwt.io/ 
+
+This JWT decoder provides you with the following parameters:
+
+| Form Parameter | Value | Description | 
+| -------------- | ----- | ----------- | 
+| alg | RS256 | Asymetric Encryption Algorithm using SHA256 hashing |
+| kid | e939...aba | Key ID |
+| typ | JWT | Identifies the type of token pasted |
+| aud | string | Audience-who or what the token is intended for | 
+| exp | 1702343792 | Expiration time (seconds since Unix epoch) |
+| iat | 1702340192 | Issued at (seconds since Unix epoch) |
+| iss | http://localhost... | Issuer (who created and signed token) | 
+| jti | 8fed... 08a2 | JWT ID (unique identifier for the token) | 
+| nbf | 1702340164 | not valid before (seconds since Unix epoch) |
+| sub | string | subject | (whom the token refers to) |
+
+
 
 
 
