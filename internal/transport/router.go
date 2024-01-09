@@ -42,7 +42,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host oauth2 JWKS endpoint
 	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
 
-	// only adding client credentials grant endpoint for now ...
+	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
 	router.HandleFunc("/jwt", granter.AuthorizationTokenHandler).Methods(http.MethodPost, http.MethodOptions)
