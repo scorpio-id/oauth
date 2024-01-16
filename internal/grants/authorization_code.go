@@ -10,6 +10,23 @@ import (
 const RESPONSE_TYPE = "code"
 const REQUEST_TYPE = "authorization_code"
 
+// Authorization Code Swagger Documentation
+//
+// @Summary Generates an authorization code as part of authorization code grant
+// @Description Accepts response_type, client_id, and redirect_url parameters in application/x-www-form-urlencoded HTTP request
+// @Tags grant
+// @Accept application/x-www-form-urlencoded
+// @Produce plain
+// @Param response_type query string true "code"
+// @Param client_id     query string true "client identifier"
+// @Param redirect_uri  query string true "target redirect URI"
+//
+// @Success	300 {string} string "Found" 
+// @Failure 400 {string} string "Bad Request - check your form params"
+// @Failure 415 {string} string "Unsupported Media Type" 
+//
+// @Router /authorize [get]
+//
 // AuthorizationCodeHandler as defined in https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
 func (g *Granter) AuthorizationCodeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
