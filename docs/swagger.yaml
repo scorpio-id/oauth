@@ -1,15 +1,5 @@
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: a Go OAuth2 issuer implementation
-  license:
-    name: MIT
-    url: https://mit-license.org
-  termsOfService: http://swagger.io/terms/
-  title: Scorpio OAuth
-  version: "1.0"
+  contact: {}
 paths:
   /authorize:
     get:
@@ -49,6 +39,97 @@ paths:
           schema:
             type: string
       summary: Generates an authorization code as part of authorization code grant
+      tags:
+      - grant
+  /jwks:
+    get:
+      description: Provides JSON Web Key Set (JWKS), RSA public keys
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: JSON Web Key Set
+  /jwt:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Accepts grant_type, code, redirect_uri, client_id in application/x-www-form-urlencoded
+        HTTP request
+      parameters:
+      - description: must be set to authorization_code
+        in: query
+        name: grant_type
+        required: true
+        type: string
+      - description: vaild autolrization code generated via /authorize
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: matching redirect_uri provided in original /authorize request
+        in: query
+        name: redirect_uri
+        required: true
+        type: string
+      - description: client identifier
+        in: query
+        name: client_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "415":
+          description: Unsupported Media Type
+          schema:
+            type: string
+      summary: Generates an access JWT via Authorization Code Grant
+      tags:
+      - grant
+  /token:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Accepts grant_type and client_id in application/x-www-form-urlencoded
+        HTTP request
+      parameters:
+      - description: must be set to client_credentials
+        in: query
+        name: grant_type
+        required: true
+        type: string
+      - description: client identifier
+        in: query
+        name: client_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "415":
+          description: Unsupported Media Type
+          schema:
+            type: string
+      summary: Generates an access JWT via Client Credentials Grant
       tags:
       - grant
 swagger: "2.0"

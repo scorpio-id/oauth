@@ -10,7 +10,7 @@ import (
 const RESPONSE_TYPE = "code"
 const REQUEST_TYPE = "authorization_code"
 
-// Authorization Code Swagger Documentation
+// Authorization Code Grant Swagger Documentation
 //
 // @Summary Generates an authorization code as part of authorization code grant
 // @Description Accepts response_type, client_id, and redirect_url parameters in application/x-www-form-urlencoded HTTP request
@@ -65,6 +65,24 @@ func (g *Granter) AuthorizationCodeHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusFound)
 }
 
+// Authorization Code Grant Swagger Documentation
+//
+// @Summary Generates an access JWT via Authorization Code Grant 
+// @Description Accepts grant_type, code, redirect_uri, client_id in application/x-www-form-urlencoded HTTP request
+// @Tags grant
+// @Accept application/x-www-form-urlencoded
+// @Produce json
+// @Param grant_type    query string true "must be set to authorization_code"
+// @Param code          query string true "vaild autolrization code generated via /authorize"
+// @Param redirect_uri  query string true "matching redirect_uri provided in original /authorize request"
+// @Param client_id     query string true "client identifier"
+//
+// @Success	200 {string} string "OK" 
+// @Failure 400 {string} string "Bad Request"
+// @Failure 415 {string} string "Unsupported Media Type" 
+//
+// @Router /jwt [post]
+//
 // AuthorizationTokenHandler as defined in https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
 func (g *Granter) AuthorizationTokenHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {

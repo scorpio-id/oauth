@@ -6,6 +6,22 @@ import (
 	"net/http"
 )
 
+// Client Credentials Swagger Documentation
+//
+// @Summary Generates an access JWT via Client Credentials Grant 
+// @Description Accepts grant_type and client_id in application/x-www-form-urlencoded HTTP request
+// @Tags grant
+// @Accept application/x-www-form-urlencoded
+// @Produce json
+// @Param grant_type    query string true "must be set to client_credentials"
+// @Param client_id     query string true "client identifier"
+//
+// @Success	200 {string} string "OK" 
+// @Failure 400 {string} string "Bad Request"
+// @Failure 415 {string} string "Unsupported Media Type" 
+//
+// @Router /token [post]
+//
 // ClientCredentialsHandler as defined in https://datatracker.ietf.org/doc/html/rfc6749#section-4.4.3
 func (g *Granter) ClientCredentialsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
