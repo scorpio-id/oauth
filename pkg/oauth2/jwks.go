@@ -28,6 +28,16 @@ func NewJSONWebKeySet(public rsa.PublicKey, kid string) jose.JSONWebKeySet {
 	}
 }
 
+// JSON Web Key Set Swagger Documentation
+//
+// @Summary JSON Web Key Set
+// @Description Provides JSON Web Key Set (JWKS), RSA public keys
+// @Produce json
+//
+// @Success	200 {string} string "OK" 
+//
+// @Router /jwks [get]
+//
 // JWKSHandler a matching HTTP endpoint for hosting jwks
 func (s *SimpleIssuer) JWKSHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := json.Marshal(s.Keys)
