@@ -7,6 +7,6 @@ server:
 oauth:
   rsa_bits: 2048
   audience: "important-resource-server"
-  issuer: "https://scorpio.io"
-  jwt_ttl: "876600h"
+  issuer: "http://localhost:8082"
+  jwt_ttl: "1h"
   jwks: "/jwks"
