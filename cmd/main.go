@@ -4,23 +4,24 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/scorpio-id/oauth/docs"
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/transport"
 )
 
-// @title Swagger Example API
+// @title Scorpio OAuth
 // @version 1.0
-// @description This is a sample rk-demo server.
+// @description a Go OAuth2 issuer implementation
 // @termsOfService http://swagger.io/terms/
 
-// @securityDefinitions.basic BasicAuth
+// @securityDefinitions.oauth2 OAuth2
 
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
 // @contact.email support@swagger.io
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name MIT
+// @license.url https://mit-license.org
 func main() {
 	// parse local config
 	cfg := config.NewConfig("internal/config/local.yml")

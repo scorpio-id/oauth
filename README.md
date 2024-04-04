@@ -86,7 +86,7 @@ Content-Type: application/json
 }
 ```
 
-## Authorizatiion Code Grant 
+## Authorization Code Grant 
 The authorization code grant is a flow in which the client application will request an authorization code from the authorization server and use the given code along with other parameters to receive an access token. The access token will be used to access the data in the user's resource server.
 
 More info on Authorization Code Grant and its standards can be found in the RFC: https://datatracker.ietf.org/doc/html/rfc6749#section-4.1
@@ -156,11 +156,4 @@ This JWT decoder provides you with the following parameters:
 | jti | 8fed... 08a2 | JWT ID (unique identifier for the token) | 
 | nbf | 1702340164 | not valid before (seconds since Unix epoch) |
 | sub | string | subject | (whom the token refers to) |
-
-
-
-
-
-
-
 
