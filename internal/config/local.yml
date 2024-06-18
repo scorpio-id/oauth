@@ -8,5 +8,5 @@ oauth:
   rsa_bits: 2048
   audience: "important-resource-server"
   issuer: "http://localhost:8082"
-  jwt_ttl: "60m"
+  jwt_ttl: "1h"
   jwks: "/jwks"

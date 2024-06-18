@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/swaggo/http-swagger/v2"
-	_ "github.com/scorpio-id/oauth/cmd/docs"
+	_ "github.com/scorpio-id/oauth/docs"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
