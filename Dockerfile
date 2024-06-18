@@ -21,7 +21,7 @@ FROM alpine:latest
 
 RUN apk update
 WORKDIR /
-COPY --from=builder /workspace/oauth .
+COPY --from=builder /workspace/scorpio-oauth .
 
 # the command to start the application
 ENTRYPOINT ["/scorpio-oauth"]
