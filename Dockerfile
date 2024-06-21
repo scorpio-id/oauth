@@ -21,6 +21,10 @@ FROM alpine:latest
 
 RUN apk update
 WORKDIR /
+
+# Add configuration files
+ADD /internal/config/local.yml /internal/config/local.yml
+
 COPY --from=builder /workspace/scorpio-oauth .
 
 # the command to start the application
