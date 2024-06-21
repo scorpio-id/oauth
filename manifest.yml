@@ -1,8 +1,0 @@
-apiVersion: apps/v1
-kind: Pod
-metadata:
-  name: scorpio
-spec:
-  containers:
-    - name: scorpio-oauth
-      image: bmazey/scorpio-oauth:v0.0.1
