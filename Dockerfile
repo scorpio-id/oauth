@@ -25,6 +25,10 @@ WORKDIR /
 # Add configuration files
 ADD /internal/config/local.yml /internal/config/local.yml
 
+# Add swagger files
+ADD /docs/swagger.json /docs/swagger.json
+ADD /docs/swagger.yaml /docs/swagger.yaml
+
 COPY --from=builder /workspace/scorpio-oauth .
 
 # the command to start the application

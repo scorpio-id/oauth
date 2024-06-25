@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: bmazey/scorpio-oauth
-  tag: 0.0.2
+  tag: v0.0.2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -42,7 +42,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8082
 
 ingress:
   enabled: false
@@ -74,11 +74,11 @@ resources: {}
 
 livenessProbe:
   httpGet:
-    path: /
+    path: /jwks
     port: http
 readinessProbe:
   httpGet:
-    path: /
+    path: /jwks
     port: http
 
 autoscaling:
