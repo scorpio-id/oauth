@@ -10,3 +10,17 @@ oauth:
   issuer: "http://localhost:8082"
   jwt_ttl: "1h"
   jwks: "/jwks"
+
+# SPNEGO configurations
+spnego:
+  volume: "/scorpio"
+  keytab: "scorpio-oauth.keytab"
+  realm: "KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  service_principal_name: "scorpio/oauth.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+
+# PKI configuration
+pki:
+  endpoint: "http://ca.scorpio.ordinarycomputing.com/spnego"
+  service_principal_name: "scorpio/ca.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  sans:
+    - "oauth.scorpio.ordinarycomputing.com"

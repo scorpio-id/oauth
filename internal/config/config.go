@@ -20,6 +20,17 @@ type Config struct {
 		TokenTTL string `yaml:"jwt_ttl"`
 		JWKS     string `yaml:"jwks"`
 	} `yaml:"oauth"`
+	SPNEGO struct {
+		Volume               string `yaml:"volume"`
+		Keytab               string `yaml:"keytab"`
+		Realm                string `yaml:"realm"`
+		ServicePrincipalName string `yaml:"service_principal_name"`
+	} `yaml:"spnego"`
+	PKI struct {
+		Endpoint             string   `yaml:"endpoint"`
+		ServicePrincipalName string `yaml:"service_principal_name"`
+		SANs                 []string `yaml:"sans"`
+	} `yaml:"pki"`
 }
 
 // NewConfig takes a .yml filename from the same /config directory, and returns a populated configuration
