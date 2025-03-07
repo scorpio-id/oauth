@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/swaggo/http-swagger/v2"
 	_ "github.com/scorpio-id/oauth/docs"
+	"github.com/swaggo/http-swagger/v2"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
+	"github.com/scorpio-id/oauth/internal/tls"
 	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
@@ -58,6 +59,10 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	router.HandleFunc("/jwt", granter.AuthorizationTokenHandler).Methods(http.MethodPost, http.MethodOptions)
 
 	// check if TLS is enabled, if so create cert client and serialize x509 if on linux OS
+	err = tls.RetrieveTLSCertificate(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return router, &granter
 }

@@ -12,7 +12,7 @@ import (
 )
 
 // RetrieveTLSCertificate invokes PKI service to obtain a signed PKCS12 for configured DNS name (ex: oauth.ordinarycomputing.com)
-func RetrieveTLSCertificate(cfg *config.Config) error {
+func RetrieveTLSCertificate(cfg config.Config) error {
 	// read password from mounted volume using configured path
 	kcfg, err := kconfig.Load("internal/config/krb5.conf")
 	if err != nil {
