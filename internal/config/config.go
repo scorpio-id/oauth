@@ -21,10 +21,9 @@ type Config struct {
 		JWKS     string `yaml:"jwks"`
 	} `yaml:"oauth"`
 	SPNEGO struct {
-		Volume               string `yaml:"volume"`
-		Keytab               string `yaml:"keytab"`
 		Realm                string `yaml:"realm"`
 		ServicePrincipalName string `yaml:"service_principal_name"`
+		Password             string `yaml:"password"`
 	} `yaml:"spnego"`
 	PKI struct {
 		Endpoint             string   `yaml:"endpoint"`

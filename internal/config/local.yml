@@ -13,10 +13,9 @@ oauth:
 
 # SPNEGO configurations
 spnego:
-  volume: "/scorpio"
-  keytab: "scorpio-oauth.keytab"
   realm: "KRB.SCORPIO.ORDINARYCOMPUTING.COM"
   service_principal_name: "scorpio/oauth.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  password: "move-to-kube-secrets-1111"
 
 # PKI configuration
 pki:

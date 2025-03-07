@@ -7,7 +7,6 @@ import (
 
 	"github.com/jcmturner/gokrb5/v8/client"
 	kconfig "github.com/jcmturner/gokrb5/v8/config"
-	"github.com/jcmturner/gokrb5/v8/keytab"
 	"github.com/jcmturner/gokrb5/v8/spnego"
 	"github.com/scorpio-id/oauth/internal/config"
 )
@@ -20,14 +19,8 @@ func RetrieveTLSCertificate(cfg *config.Config) error {
 		return err
 	}
 
-	// create KRB client
-	kt, err := keytab.Load(cfg.SPNEGO.Volume + "/" + cfg.SPNEGO.Keytab)
-	if err != nil {
-		return err
-	}
-
 	// initialize Kerberos client and authenticate for TGT
-	cl := client.NewWithKeytab(cfg.SPNEGO.ServicePrincipalName, cfg.SPNEGO.Realm, kt, kcfg)
+	cl := client.NewWithPassword(cfg.SPNEGO.ServicePrincipalName, cfg.SPNEGO.Realm, cfg.SPNEGO.Password, kcfg)
 	err = cl.Login()
 	if err != nil {
 		return err
