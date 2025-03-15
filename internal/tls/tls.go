@@ -1,7 +1,9 @@
 package tls
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -47,14 +49,25 @@ func RetrieveTLSCertificate(cfg config.Config) error {
 
 	r, _ := http.NewRequest("POST", destination.String(), nil)
 
+	// disable SSL for SPNEGO
+	customTransport := http.DefaultTransport.(*http.Transport).Clone()
+	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	httpclient := &http.Client{Transport: customTransport}
+
 	// TODO check if correct SPN 
-	spnegocl := spnego.NewClient(cl, nil, cfg.PKI.ServicePrincipalName)
+	spnegocl := spnego.NewClient(cl, httpclient, cfg.PKI.ServicePrincipalName)
 	response, err := spnegocl.Do(r)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("status: " + response.Status)
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(body))
 
 	// TODO read response and install PKCS12 (root + intermediate)
 

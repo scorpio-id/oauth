@@ -19,7 +19,7 @@ spnego:
 
 # PKI configuration
 pki:
-  endpoint: "http://ca.scorpio.ordinarycomputing.com:8081/spnego"
-  service_principal_name: "scorpio/ca.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  endpoint: "https://ca.scorpio.ordinarycomputing.com:8081/spnego"
+  service_principal_name: "scorpio-pki/ca.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
   sans:
     - "oauth.scorpio.ordinarycomputing.com"
