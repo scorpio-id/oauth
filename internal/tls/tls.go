@@ -55,7 +55,7 @@ func RetrieveTLSCertificate(cfg config.Config) error {
 	httpclient := &http.Client{Transport: customTransport}
 
 	// TODO check if correct SPN 
-	spnegocl := spnego.NewClient(cl, httpclient, cfg.PKI.ServicePrincipalName)
+	spnegocl := spnego.NewClient(cl, httpclient, "")
 	response, err := spnegocl.Do(r)
 	if err != nil {
 		return err
