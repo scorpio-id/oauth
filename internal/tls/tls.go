@@ -48,6 +48,7 @@ func RetrieveTLSCertificate(cfg config.Config) error {
 	fmt.Println("destination pki url: " + destination.String())
 
 	r, _ := http.NewRequest("POST", destination.String(), nil)
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	// disable SSL for SPNEGO
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
@@ -55,7 +56,7 @@ func RetrieveTLSCertificate(cfg config.Config) error {
 	httpclient := &http.Client{Transport: customTransport}
 
 	// TODO check if correct SPN 
-	spnegocl := spnego.NewClient(cl, httpclient, "")
+	spnegocl := spnego.NewClient(cl, httpclient, "HTTP/ca.scorpio.ordinarycomputing.com")
 	response, err := spnegocl.Do(r)
 	if err != nil {
 		return err
