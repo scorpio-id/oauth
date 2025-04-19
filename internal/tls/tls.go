@@ -79,7 +79,7 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 }
 
 func SerializePKCS12(content []byte, path string) error {
-	key, cert, _, err := pkcs12.DecodeChain(content, "")
+	key, cert, cacerts, err := pkcs12.DecodeChain(content, "")
     if err != nil {
         return err
     }
@@ -101,6 +101,17 @@ func SerializePKCS12(content []byte, path string) error {
 
 	// TODO: check to ensure serialized correctly
 	err = pem.Encode(w, &leaf)
+	if err != nil {
+		return err
+	}
+
+	root := pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: cacerts[0].Raw,
+	}
+
+	// TODO: check to ensure serialized correctly
+	err = pem.Encode(w, &root)
 	if err != nil {
 		return err
 	}
