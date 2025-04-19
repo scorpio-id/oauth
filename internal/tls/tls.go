@@ -2,7 +2,11 @@ package tls
 
 import (
 	"bufio"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -77,16 +81,13 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 }
 
 func SerializePKCS12(content []byte, path string) error {
-	// TODO check if password on .p12 file
-	// TODO convert content []byte to .p12 file and save to filesystem
-	// TODO remove underscore and install cacert as root certificate on filesystem
-	key, cert, _, err := pkcs12.DecodeChain(content, "")
+	key, cert, cacert, err := pkcs12.DecodeChain(content, "")
     if err != nil {
         return err
     }
 
 	// store .cer file on provided filesystem path
-	cout, err := os.Create(path + "/scorpio-oauth.crt")
+	cout, err := os.Create(path + "/scorpio-oauth.pem")
     if err != nil {
         return err
     }
@@ -94,7 +95,29 @@ func SerializePKCS12(content []byte, path string) error {
 	defer cout.Close()
 
 	w := bufio.NewWriter(cout)
-	w.Write(cert.Raw)
+
+	leaf := pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: cert.Raw,
+	}
+
+	// TODO: check to ensure serialized correctly
+	err = pem.Encode(w, &leaf)
+	if err != nil {
+		return err
+	}
+
+	// TODO install all certs, not just first!
+	root := pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: cacert[0].Raw,
+	}
+
+	// TODO: check to ensure serialized correctly
+	err = pem.Encode(w, &root)
+	if err != nil {
+		return err
+	}
 
 	w.Flush()
 
@@ -108,7 +131,22 @@ func SerializePKCS12(content []byte, path string) error {
 
 	// FIXME might be incorrect way of converting interface to []byte
 	w = bufio.NewWriter(kout)
-	w.Write(key.([]byte))
+
+	private, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return errors.New("unable to convert key interface to *rsa.PrivateKey")
+	}
+
+	pemkey := pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(private), 
+	}
+
+	// TODO: check to ensure serialized correctly
+	err = pem.Encode(w, &pemkey)
+	if err != nil {
+		return err
+	}
 
 	w.Flush()
 

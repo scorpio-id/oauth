@@ -32,7 +32,7 @@ func main() {
 
 	// start the server
 	if runtime.GOOS == "linux" {
-		log.Fatal(http.ListenAndServeTLS(":"+cfg.Server.Port, "/etc/ssl/certs/scorpio-oauth.crt", "/etc/ssl/certs/scorpio-oauth.key", router))
+		log.Fatal(http.ListenAndServeTLS(":"+cfg.Server.Port, "/etc/ssl/certs/scorpio-oauth.pem", "/etc/ssl/certs/scorpio-oauth.key", router))
 	} else {
 		log.Fatal(http.ListenAndServe(":"+cfg.Server.Port, router))
 	}
