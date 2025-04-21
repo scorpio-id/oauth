@@ -7,7 +7,7 @@ server:
 oauth:
   rsa_bits: 2048
   audience: "important-resource-server"
-  issuer: "http://localhost:8082"
+  issuer: "https://oauth.scorpio.ordinarycomputing.com:8082/jwks"
   jwt_ttl: "1h"
   jwks: "/jwks"
 

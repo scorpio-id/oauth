@@ -44,7 +44,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	// adding swagger 
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://oauth.scorpio.ordinarycomputing.com:" + cfg.Server.Port + "/swagger/doc.json"),
+		httpSwagger.URL("https://oauth.scorpio.ordinarycomputing.com:" + cfg.Server.Port + "/swagger/doc.json"),
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("swagger-ui"),
