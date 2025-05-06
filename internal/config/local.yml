@@ -7,6 +7,19 @@ server:
 oauth:
   rsa_bits: 2048
   audience: "important-resource-server"
-  issuer: "http://localhost:8082"
+  issuer: "https://oauth.scorpio.ordinarycomputing.com:8082/jwks"
   jwt_ttl: "1h"
   jwks: "/jwks"
+
+# SPNEGO configurations
+spnego:
+  realm: "KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  service_principal_name: "scorpio-oauth"
+  password: "move-to-kube-secrets-1111"
+
+# PKI configuration
+pki:
+  endpoint: "https://ca.scorpio.ordinarycomputing.com:8081/spnego"
+  service_principal_name: "HTTP/ca.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  sans:
+    - "oauth.scorpio.ordinarycomputing.com"

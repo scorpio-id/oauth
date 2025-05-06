@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/swaggo/http-swagger/v2"
 	_ "github.com/scorpio-id/oauth/docs"
+	"github.com/swaggo/http-swagger/v2"
 
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
+	"github.com/scorpio-id/oauth/internal/tls"
 	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
@@ -43,7 +44,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	// adding swagger 
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:" + cfg.Server.Port + "/swagger/doc.json"),
+		httpSwagger.URL("https://oauth.scorpio.ordinarycomputing.com:" + cfg.Server.Port + "/swagger/doc.json"),
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("swagger-ui"),
@@ -52,10 +53,22 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host oauth2 JWKS endpoint
 	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
 
-	// only adding client credentials grant endpoint for now ...
+	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
 	router.HandleFunc("/jwt", granter.AuthorizationTokenHandler).Methods(http.MethodPost, http.MethodOptions)
+
+	// check if TLS is enabled, if so create cert client and serialize x509 if on linux OS
+	content, err := tls.RetrieveTLSCertificate(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// serialize PKCS12 for SSL
+	err = tls.SerializePKCS12(content, "/etc/ssl/certs")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return router, &granter
 }
