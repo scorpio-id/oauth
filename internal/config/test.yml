@@ -10,3 +10,16 @@ oauth:
   issuer: "https://identity.io"
   jwt_ttl: "60m"
   jwks: "/jwks"
+
+# SPNEGO configurations
+spnego:
+  volume: "/scorpio"
+  keytab: "scorpio-oauth.keytab"
+  realm: "KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  service_principal_name: "scorpio/oauth.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+
+# PKI configuration
+pki:
+  endpoint: "http://ca.scorpio.ordinarycomputing.com/spnego"
+  sans:
+    - "oauth.scorpio.ordinarycomputing.com"
