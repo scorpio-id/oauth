@@ -3,11 +3,9 @@ package tls
 import (
 	"bufio"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -52,24 +50,16 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 
 	destination.RawQuery = q.Encode()
 
-	fmt.Println("destination pki url: " + destination.String())
-
 	r, _ := http.NewRequest("POST", destination.String(), nil)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	// disable SSL for SPNEGO
-	customTransport := http.DefaultTransport.(*http.Transport).Clone()
-	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	httpclient := &http.Client{Transport: customTransport}
-
 	// TODO check if correct SPN 
-	spnegocl := spnego.NewClient(cl, httpclient, "HTTP/ca.scorpio.ordinarycomputing.com")
+	spnegocl := spnego.NewClient(cl, &http.Client{}, "HTTP/ca.scorpio.ordinarycomputing.com")
 	response, err := spnegocl.Do(r)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("status: " + response.Status)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
