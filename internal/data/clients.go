@@ -4,15 +4,15 @@ import "sync"
 
 // ClientStore acts as a simple in-memory client_id datastore
 type ClientStore struct {
-	IDs []string
+	IDs []ClientID
 	mu  sync.RWMutex
 }
 
 type ClientID struct {
 	ID                    string            `json:"id"`
 	Email                 string            `json:"email"`
-	ServicePrincipalName  string            `json:"service_principal_name"`
 	UserPrincipalName     string            `json:"user_principal_name"`
+	ServicePrincipalName  string            `json:"service_principal_name"`
 	CommonName            string            `json:"common_name"`
 	SubjectAlternateNames []string          `json:"subject_alternate_names"`
 	Authorizations        map[string]string `json:"authorizations"`
@@ -20,15 +20,15 @@ type ClientID struct {
 
 func NewClientStore() ClientStore {
 	return ClientStore{
-		IDs: make([]string, 0),
+		IDs: make([]ClientID, 0),
 	}
 }
 
-func (c *ClientStore) Create() {
+func (c *ClientStore) Add(id ClientID) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.IDs = append(c.IDs)
+	c.IDs = append(c.IDs, id)
 }
 
 func (c *ClientStore) Delete(id string) {
@@ -36,7 +36,7 @@ func (c *ClientStore) Delete(id string) {
 	defer c.mu.Unlock()
 
 	for i, v := range c.IDs {
-		if v == id {
+		if v.ID == id {
 			c.IDs = append(c.IDs[:i], c.IDs[i+1:]...)
 			break
 		}
@@ -48,7 +48,7 @@ func (c *ClientStore) Contains(id string) bool {
 	defer c.mu.RUnlock()
 
 	for _, v := range c.IDs {
-		if v == id {
+		if v.ID == id {
 			return true
 		}
 	}
