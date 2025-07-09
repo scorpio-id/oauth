@@ -2,12 +2,13 @@ package data
 
 import "sync"
 
-// ClientStore acts as a simple in-memory client_id datastore
+// ClientStore acts as a simple in-memory client id datastore
 type ClientStore struct {
 	IDs []ClientID
 	mu  sync.RWMutex
 }
 
+// ClientID represents an OAuth Client Identifier (user or application, created via registration)
 type ClientID struct {
 	ID                    string            `json:"id"`
 	Email                 string            `json:"email"`
