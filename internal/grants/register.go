@@ -53,7 +53,7 @@ func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	
 	common := r.FormValue("common_name")
 
-	// FIXME add support for multiple names
+	// FIXME add support for multiple subject alternate names
 	san := r.FormValue("subject_alternate_names")
 
 	
