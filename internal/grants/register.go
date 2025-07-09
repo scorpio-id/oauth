@@ -55,7 +55,6 @@ func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 
 	// FIXME add support for multiple subject alternate names
 	san := r.FormValue("subject_alternate_names")
-
 	
 	id := data.ClientID {
 		ID: client,
