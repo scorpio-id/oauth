@@ -8,6 +8,16 @@ type ClientStore struct {
 	mu  sync.RWMutex
 }
 
+type ClientID struct {
+	ID                    string            `json:"id"`
+	Email                 string            `json:"email"`
+	ServicePrincipalName  string            `json:"service_principal_name"`
+	UserPrincipalName     string            `json:"user_principal_name"`
+	CommonName            string            `json:"common_name"`
+	SubjectAlternateNames []string          `json:"subject_alternate_names"`
+	Authorizations        map[string]string `json:"authorizations"`
+}
+
 func NewClientStore() ClientStore {
 	return ClientStore{
 		IDs: make([]string, 0),
