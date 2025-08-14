@@ -4,8 +4,8 @@ import "sync"
 
 // ClientStore acts as a simple in-memory client id datastore
 type ClientStore struct {
-	IDs []ClientID
-	mu  sync.RWMutex
+	IDs []ClientID    `json:"clients"`
+	mu  *sync.RWMutex `json:"-"`
 }
 
 // ClientID represents an OAuth Client Identifier (user or application, created via registration)

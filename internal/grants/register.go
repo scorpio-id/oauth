@@ -1,6 +1,8 @@
 package grants
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/scorpio-id/oauth/internal/data"
@@ -68,4 +70,18 @@ func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	g.ClientStore.Add(id)
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (g *Granter) MetadataHandler(w http.ResponseWriter, r *http.Request) {
+
+	// return JSON representation of client id store
+	w.Header().Set("Content-Type", "application/json")
+
+	content, err := json.Marshal(g.ClientStore)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Fatal(err)
+	}
+
+	w.Write(content)
 }

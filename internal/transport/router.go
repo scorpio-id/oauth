@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"log"
 	"net/http"
+	"runtime"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -56,21 +57,26 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host registration endpoint
 	router.HandleFunc("/register", granter.RegistrationHandler).Methods(http.MethodPost, http.MethodOptions)
 
+	// metadata endpoints for console ui
+	router.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
+
 	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
 	router.HandleFunc("/jwt", granter.AuthorizationTokenHandler).Methods(http.MethodPost, http.MethodOptions)
 
 	// check if TLS is enabled, if so create cert client and serialize x509 if on linux OS
-	content, err := tls.RetrieveTLSCertificate(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	if runtime.GOOS == "linux" {
+		content, err := tls.RetrieveTLSCertificate(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	// serialize PKCS12 for SSL
-	err = tls.SerializePKCS12(content, "/etc/ssl/certs")
-	if err != nil {
-		log.Fatal(err)
+		// serialize PKCS12 for SSL
+		err = tls.SerializePKCS12(content, "/etc/ssl/certs")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	return router, &granter
