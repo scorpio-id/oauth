@@ -71,12 +71,13 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Println("status: " + response.Status)
+	fmt.Println("PKI HTTP Status: " + response.Status)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Default().Print(err.Error())
 		return nil, err
 	}
+
+	log.Default().Print(string(body))
 
 	return body, nil
 }
