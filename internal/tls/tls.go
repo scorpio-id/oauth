@@ -77,8 +77,6 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Default().Print(string(body))
-
 	return body, nil
 }
 
