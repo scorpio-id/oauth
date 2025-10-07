@@ -73,6 +73,11 @@ func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Granter) MetadataHandler(w http.ResponseWriter, r *http.Request) {
+	// check CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+        return
+    }
 
 	// return JSON representation of client id store
 	w.Header().Set("Content-Type", "application/json")

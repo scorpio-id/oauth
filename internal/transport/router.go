@@ -57,9 +57,6 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host registration endpoint
 	router.HandleFunc("/register", granter.RegistrationHandler).Methods(http.MethodPost, http.MethodOptions)
 
-	// metadata endpoints for console ui
-	router.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
-
 	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
@@ -78,6 +75,15 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 			log.Fatal(err)
 		}
 	}
+
+	// create a subrouter for CORS-enabled UIs
+	subr := router.PathPrefix("/ui").Subrouter()
+
+	// metadata endpoint for console UI
+	subr.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
+
+	// enable CORS 
+	subr.Use(mux.CORSMethodMiddleware(subr))
 
 	return router, &granter
 }
