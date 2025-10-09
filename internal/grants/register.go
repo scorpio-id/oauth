@@ -30,6 +30,15 @@ import (
 //
 // RegistrationHandler allows new users, applications, and administrators to create OAuth2 client IDs
 func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
+
+	// FIXME move CORS URLs to config
+	// check CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	if r.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+        return
+    }
+
 	if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
 		return
