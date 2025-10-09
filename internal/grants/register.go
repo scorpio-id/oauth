@@ -73,6 +73,8 @@ func (g *Granter) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Granter) MetadataHandler(w http.ResponseWriter, r *http.Request) {
+
+	// FIXME move CORS URLs to config
 	// check CORS headers
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if r.Method == http.MethodOptions {
