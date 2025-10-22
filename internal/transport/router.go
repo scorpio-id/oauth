@@ -76,7 +76,10 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// create a subrouter for CORS-enabled UIs
 	subr := router.PathPrefix("/ui").Subrouter()
 
-	// metadata endpoint for console UI
+	// config endpoint for console
+	subr.HandleFunc("/config", cfg.ConfigHandler).Methods(http.MethodGet, http.MethodOptions)
+
+	// metadata endpoint for console
 	subr.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
 
 	// host registration endpoint
