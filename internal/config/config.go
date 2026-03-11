@@ -25,7 +25,7 @@ type Config struct {
 	SPNEGO struct {
 		Realm                string `yaml:"realm" json:"realm"`
 		ServicePrincipalName string `yaml:"service_principal_name" json:"service_principal_name"`
-		Password             string `yaml:"password" json:"password"`
+		Password             string `yaml:"password" json:"-"`
 	} `yaml:"spnego" json:"spnego"`
 	PKI struct {
 		Endpoint             string   `yaml:"endpoint" json:"endpoint"`
@@ -71,5 +71,4 @@ func (conf *Config) ConfigHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(content)
-
 }
