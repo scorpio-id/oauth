@@ -25,6 +25,7 @@ func NewClientStore() ClientStore {
 	}
 }
 
+// FIXME ensure client added is unique
 func (c *ClientStore) Add(id ClientID) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

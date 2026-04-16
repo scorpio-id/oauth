@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"math/big"
@@ -111,6 +112,7 @@ func (persist *Persistence) SetX509(cert *x509.Certificate) error {
 
 	return nil
 }
+
 func (persist *Persistence) GetX509(id *big.Int) (*x509.Certificate, error) {
 	result, err := persist.Client.Get(persist.Context, "certificate:"+id.String()).Result()
 	if err != nil {
@@ -124,4 +126,35 @@ func (persist *Persistence) GetX509(id *big.Int) (*x509.Certificate, error) {
 	}
 
 	return x509.ParseCertificate(block.Bytes)
+}
+
+func (persist *Persistence) SetClientID(cid ClientID) error {
+	// marshal metadata struct to json and store with gob: https://stackoverflow.com/questions/53697507/save-generic-struct-to-redis
+	result, err := json.Marshal(cid)
+	if err != nil {
+		return err
+	}
+
+	err = persist.Client.Set(persist.Context, "client:"+cid.ID, result, 0).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (persist *Persistence) GetClientID(id string) (*ClientID, error) {
+	// unmarshal json gob bytes into struct: https://stackoverflow.com/questions/53697507/save-generic-struct-to-redis
+	var cid ClientID
+	result, err := persist.Client.Get(persist.Context, "client:"+id).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(result), &cid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cid, nil
 }
