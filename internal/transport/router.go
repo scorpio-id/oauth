@@ -54,12 +54,6 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// host oauth2 JWKS endpoint
 	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
 
-	// host registration endpoint
-	router.HandleFunc("/register", granter.RegistrationHandler).Methods(http.MethodPost, http.MethodOptions)
-
-	// metadata endpoints for console ui
-	router.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
-
 	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
 	router.HandleFunc("/authorize", granter.AuthorizationCodeHandler).Methods(http.MethodGet, http.MethodOptions)
@@ -78,6 +72,21 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 			log.Fatal(err)
 		}
 	}
+
+	// create a subrouter for CORS-enabled UIs
+	subr := router.PathPrefix("/ui").Subrouter()
+
+	// config endpoint for console
+	subr.HandleFunc("/config", cfg.ConfigHandler).Methods(http.MethodGet, http.MethodOptions)
+
+	// metadata endpoint for console
+	subr.HandleFunc("/metadata", granter.MetadataHandler).Methods(http.MethodGet, http.MethodOptions)
+
+	// host registration endpoint
+	subr.HandleFunc("/register", granter.RegistrationHandler).Methods(http.MethodPost, http.MethodOptions)
+
+	// enable CORS 
+	subr.Use(mux.CORSMethodMiddleware(subr))
 
 	return router, &granter
 }
