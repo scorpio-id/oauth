@@ -6,7 +6,7 @@ server:
 # oauth configurations
 oauth:
   rsa_bits: 2048
-  audience: "valley-print-services"
+  audience: "important-resource-server"
   issuer: "https://oauth.scorpio.ordinarycomputing.com:8082"
   jwt_ttl: "1h"
   jwks: "/jwks"
