@@ -3,6 +3,15 @@ server:
   host: "http://127.0.0.1"
   port: 8081
 
+# redis configurations
+persistence:
+  enabled: false
+  host: "db-valkey-nyc1-scorpio-do-user-16782644-0.l.db.ondigitalocean.com"
+  port: 25061
+  user: "default"
+  path: "/etc/scorpio-secret/password"
+  database: 1
+
 # oauth configurations
 oauth:
   rsa_bits: 2048

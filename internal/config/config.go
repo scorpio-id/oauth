@@ -15,6 +15,15 @@ type Config struct {
 		Port string `yaml:"port" json:"port"`
 		Host string `yaml:"host" json:"host"`
 	} `yaml:"server" json:"server"`
+	Persistence struct {
+		Enabled  bool   `yaml:"enabled" json:"enabled"`
+		Port     string `yaml:"port" json:"port"`
+		Host     string `yaml:"host" json:"host"`
+		User     string `yaml:"user" json:"user"`
+		Path     string `yaml:"path" json:"path"`
+		Password string `yaml:"-" json:"-"` // DO NOT MARSHAL PASSWORD!
+		Database int    `yaml:"database" json:"database"`
+	} `yaml:"persistence" json:"persistence"`
 	OAuth struct {
 		RSABits  int    `yaml:"rsa_bits" json:"rsa_bits"`
 		Audience string `yaml:"audience" json:"audience"`
@@ -44,9 +53,20 @@ func NewConfig(s string) Config {
 
 	var cfg Config
 	decoder := yaml.NewDecoder(f)
+
 	err = decoder.Decode(&cfg)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// TODO retrieve content from Kube Secrets using configured file paths if persistence enabled
+	if cfg.Persistence.Enabled {
+		content, err := os.ReadFile(cfg.Persistence.Path)
+		if err != nil {
+			log.Fatalf("Error reading file: %v", err)
+		}
+
+		cfg.Persistence.Password = string(content)
 	}
 
 	return cfg
