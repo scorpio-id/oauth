@@ -105,6 +105,7 @@ func (g *Granter) IsTrustedDevice(device string, client string) bool {
 	return g.TrustedDeviceStore.Contains(device, client)
 }
 
+// FIXME this should load a PKCS12 and unpack the byte contents (see tls.go)
 func (g *Granter) ObtainWebServerIdentity(cfg config.Config) (*rsa.PrivateKey, []byte, error) {
 	if cfg.Persistence.Enabled {
 		private, webcert, err := g.ClientStore.LoadWebX509AndPrivateKey()

@@ -81,6 +81,7 @@ func (store *ClientStore) LoadWebX509AndPrivateKey() (*rsa.PrivateKey, []byte, e
 	return private, cert.Raw, nil
 }
 
+// FIXME this should clearly load the key pair used by the granter to sign JWTs
 func (store *ClientStore) LoadKeyPair() (*rsa.PrivateKey, error) {
 	if !store.Persist.cfg.Persistence.Enabled {
 		return rsa.GenerateKey(rand.Reader, store.Persist.cfg.OAuth.RSABits)
