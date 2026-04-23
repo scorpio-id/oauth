@@ -36,9 +36,10 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
 
 	// create a granter
+	// FIXME update config struct to include the below materials
 	name = cfg.Server.Host + ":" + cfg.Server.Port
 	minutes, _ := time.ParseDuration("10m")
-	granter := grants.NewGranter(issuer, minutes, 8, name+"/device")
+	granter := grants.NewGranter(cfg, issuer, minutes, 8, name+"/device")
 
 	// create gorilla mux router
 	router := mux.NewRouter()
@@ -61,6 +62,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	// check if TLS is enabled, if so create cert client and serialize x509 if on linux OS
 	if runtime.GOOS == "linux" {
+		// TODO replace with granter.ObtainWebServerIdentity()
 		content, err := tls.RetrieveTLSCertificate(cfg)
 		if err != nil {
 			log.Fatal(err)

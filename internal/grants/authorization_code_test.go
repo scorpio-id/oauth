@@ -34,7 +34,7 @@ func TestAuthorizationCodeGrant(t *testing.T) {
 	// create a granter
 	name = cfg.Server.Host + ":" + cfg.Server.Port
 	minutes, _ := time.ParseDuration("10m")
-	granter := NewGranter(issuer, minutes, 8, name)
+	granter := NewGranter(cfg, issuer, minutes, 8, name)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/authorize", granter.AuthorizationCodeHandler)

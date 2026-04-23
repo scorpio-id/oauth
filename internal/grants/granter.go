@@ -1,11 +1,19 @@
 package grants
 
 import (
+	crand "crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
+	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/data"
+	"github.com/scorpio-id/oauth/internal/tls"
 	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
@@ -26,10 +34,10 @@ type Granter struct {
 	UserCodeLength     int
 }
 
-func NewGranter(issuer oauth2.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
+func NewGranter(cfg config.Config, issuer oauth2.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
 	return Granter{
 		Issuer:           issuer,
-		ClientStore:      data.NewClientStore(),
+		ClientStore:      data.NewClientStore(cfg),
 		InteractionStore: data.NewInteractionStore(),
 		CodeTTL:          ttl,
 		VerificationURI:  uri,
@@ -95,6 +103,62 @@ func (g *Granter) AuthorizeClient(client string, code string) error {
 // IsTrustedDevice returns true iff there exists at least one trusted device with matching client_id and device_code
 func (g *Granter) IsTrustedDevice(device string, client string) bool {
 	return g.TrustedDeviceStore.Contains(device, client)
+}
+
+func (g *Granter) ObtainWebServerIdentity(cfg config.Config) (*rsa.PrivateKey, []byte, error) {
+	if cfg.Persistence.Enabled {
+		private, webcert, err := g.ClientStore.LoadWebX509AndPrivateKey()
+
+		// persistence is enabled, but no web cert has been generated yet
+		if err == redis.Nil {
+			fmt.Println("persistence enabled, but no web private key, x509 found. generating ...")
+			private, err = rsa.GenerateKey(crand.Reader, cfg.OAuth.RSABits)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// TODO replace with tls.GetCert()
+			webcert, err := tls.RetrieveTLSCertificate(cfg)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			// FIXME save certs to persistence, move to function?
+			content, err := x509.ParseCertificate(webcert)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			err = g.ClientStore.Persist.SetX509(content)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			err = g.ClientStore.Persist.SetRSAKeyPair(private)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+		} else if err != nil {
+			log.Fatal(err)
+		}
+
+		return private, webcert, err
+	}
+
+	// If persistence is turned off create new keys and certificates from scratch
+	private, err := rsa.GenerateKey(crand.Reader, cfg.OAuth.RSABits)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// TODO use tls.GetCert()
+	webcert, err := tls.RetrieveTLSCertificate(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return private, webcert, err
 }
 
 func (g *Granter) generateDeviceCode() string {

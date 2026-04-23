@@ -1,11 +1,19 @@
 package data
 
-import "sync"
+import (
+	"sync"
+	"crypto/rand"
+	"crypto/rsa"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/scorpio-id/oauth/internal/config"
+)
 
 // ClientStore acts as a simple in-memory client id datastore
 type ClientStore struct {
-	IDs []ClientID   `json:"clients"`
-	mu  sync.RWMutex `json:"-"`
+	IDs     []ClientID   `json:"clients"`
+	Persist Persistence
+	mu      sync.RWMutex
 }
 
 // ClientID represents an OAuth Client Identifier (user or application, created via registration)
@@ -19,9 +27,10 @@ type ClientID struct {
 	Authorizations        map[string]string `json:"authorizations"`
 }
 
-func NewClientStore() ClientStore {
+func NewClientStore(cfg config.Config) ClientStore {
 	return ClientStore{
 		IDs: make([]ClientID, 0),
+		Persist: NewPersistenceClient(cfg),
 	}
 }
 
@@ -56,4 +65,47 @@ func (c *ClientStore) Contains(id string) bool {
 	}
 
 	return false
+}
+
+func (store *ClientStore) LoadWebX509AndPrivateKey() (*rsa.PrivateKey, []byte, error) {
+	private, err := store.LoadKeyPair()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cert, err := store.Persist.GetX509()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return private, cert.Raw, nil
+}
+
+func (store *ClientStore) LoadKeyPair() (*rsa.PrivateKey, error) {
+	if !store.Persist.cfg.Persistence.Enabled {
+		return rsa.GenerateKey(rand.Reader, store.Persist.cfg.OAuth.RSABits)
+	}
+
+	stored, err := store.Persist.GetRSAKeyPair()
+
+	// case: key doesn't exist in persistence store
+	if err == redis.Nil {
+		// start by creating a RSA public/private key pair
+		private, err := rsa.GenerateKey(rand.Reader, store.Persist.cfg.OAuth.RSABits)
+		if err != nil {
+			return nil, err
+		}
+
+		err = store.Persist.SetRSAKeyPair(private)
+		if err != nil {
+			return nil, err
+		}
+
+		return private, nil
+
+	} else if err != nil {
+		return nil, err
+	}
+
+	return stored, nil
 }

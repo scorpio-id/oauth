@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
-	"math/big"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/scorpio-id/oauth/internal/config"
@@ -56,7 +55,7 @@ func NewPersistenceClient(cfg config.Config) Persistence {
 	} 
 }
 
-func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey, id *big.Int) error {
+func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey) error {
 	// convert RSA key pair into a PEM-encoded string
 	bytes := x509.MarshalPKCS1PrivateKey(private)
 	block := pem.EncodeToMemory(
@@ -67,7 +66,7 @@ func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey, id *big.Int) 
 	)
 
 	// store RSA key value pair
-	err := persist.Client.Set(persist.Context, "rsa:"+id.String(), string(block), 0).Err()
+	err := persist.Client.Set(persist.Context, "rsa:", string(block), 0).Err()
 	if err != nil {
 		return err
 	}
@@ -75,8 +74,8 @@ func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey, id *big.Int) 
 	return nil
 }
 
-func (persist *Persistence) GetRSAKeyPair(id *big.Int) (*rsa.PrivateKey, error) {
-	result, err := persist.Client.Get(persist.Context, "rsa:"+id.String()).Result()
+func (persist *Persistence) GetRSAKeyPair() (*rsa.PrivateKey, error) {
+	result, err := persist.Client.Get(persist.Context, "rsa:").Result()
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +95,6 @@ func (persist *Persistence) GetRSAKeyPair(id *big.Int) (*rsa.PrivateKey, error) 
 }
 
 func (persist *Persistence) SetX509(cert *x509.Certificate) error {
-	sserial := cert.SerialNumber.String()
 
 	certBlock := pem.EncodeToMemory(
 		&pem.Block{
@@ -105,7 +103,7 @@ func (persist *Persistence) SetX509(cert *x509.Certificate) error {
 		},
 	)
 
-	err := persist.Client.Set(persist.Context, "certificate:"+sserial, string(certBlock), 0).Err()
+	err := persist.Client.Set(persist.Context, "certificate:", string(certBlock), 0).Err()
 	if err != nil {
 		return err
 	}
@@ -113,8 +111,8 @@ func (persist *Persistence) SetX509(cert *x509.Certificate) error {
 	return nil
 }
 
-func (persist *Persistence) GetX509(id *big.Int) (*x509.Certificate, error) {
-	result, err := persist.Client.Get(persist.Context, "certificate:"+id.String()).Result()
+func (persist *Persistence) GetX509() (*x509.Certificate, error) {
+	result, err := persist.Client.Get(persist.Context, "certificate:").Result()
 	if err != nil {
 		return nil, err
 	}

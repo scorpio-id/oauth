@@ -7,6 +7,7 @@ import (
 )
 
 // Interaction stores information generated during grant flows
+// TODO add to persistence with JSON fields
 type Interaction struct {
 	ClientID          string
 	AuthorizationCode string
