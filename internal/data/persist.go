@@ -55,7 +55,7 @@ func NewPersistenceClient(cfg config.Config) Persistence {
 	} 
 }
 
-func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey) error {
+func (persist *Persistence) SetSigningRSAKeyPair(private *rsa.PrivateKey) error {
 	// convert RSA key pair into a PEM-encoded string
 	bytes := x509.MarshalPKCS1PrivateKey(private)
 	block := pem.EncodeToMemory(
@@ -74,7 +74,7 @@ func (persist *Persistence) SetRSAKeyPair(private *rsa.PrivateKey) error {
 	return nil
 }
 
-func (persist *Persistence) GetRSAKeyPair() (*rsa.PrivateKey, error) {
+func (persist *Persistence) GetSigningRSAKeyPair() (*rsa.PrivateKey, error) {
 	result, err := persist.Client.Get(persist.Context, "rsa:").Result()
 	if err != nil {
 		return nil, err
@@ -94,16 +94,9 @@ func (persist *Persistence) GetRSAKeyPair() (*rsa.PrivateKey, error) {
 	return private, nil
 }
 
-func (persist *Persistence) SetX509(cert *x509.Certificate) error {
+func (persist *Persistence) SetPKCS12(pfx []byte) error {
 
-	certBlock := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert.Raw,
-		},
-	)
-
-	err := persist.Client.Set(persist.Context, "certificate:", string(certBlock), 0).Err()
+	err := persist.Client.Set(persist.Context, "pfx:", string(pfx), 0).Err()
 	if err != nil {
 		return err
 	}
@@ -111,19 +104,13 @@ func (persist *Persistence) SetX509(cert *x509.Certificate) error {
 	return nil
 }
 
-func (persist *Persistence) GetX509() (*x509.Certificate, error) {
-	result, err := persist.Client.Get(persist.Context, "certificate:").Result()
+func (persist *Persistence) GetPKCS12() ([]byte, error) {
+	result, err := persist.Client.Get(persist.Context, "pfx:").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	// convert PEM-encoded string back into *x509.Certificate interface
-	block, _ := pem.Decode([]byte(result))
-	if block == nil {
-		return nil, errors.New("failed to parse PEM block containing the certificate")
-	}
-
-	return x509.ParseCertificate(block.Bytes)
+	return []byte(result), nil
 }
 
 func (persist *Persistence) SetClientID(cid ClientID) error {

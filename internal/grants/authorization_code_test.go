@@ -1,8 +1,6 @@
 package grants
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"fmt"
 	"io"
 	"log"
@@ -12,7 +10,6 @@ import (
 	"time"
 
 	"github.com/scorpio-id/oauth/internal/config"
-	"github.com/scorpio-id/oauth/pkg/oauth2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,21 +17,13 @@ import (
 func TestAuthorizationCodeGrant(t *testing.T) {
 	cfg := config.NewConfig("../config/test.yml")
 
-	// generate an RSA key pair
-	private, err := rsa.GenerateKey(rand.Reader, cfg.OAuth.RSABits)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// create issuer for testing purposes
-	name := cfg.OAuth.Issuer
-	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
-	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
-
 	// create a granter
-	name = cfg.Server.Host + ":" + cfg.Server.Port
+	name := cfg.Server.Host + ":" + cfg.Server.Port
 	minutes, _ := time.ParseDuration("10m")
-	granter := NewGranter(cfg, issuer, minutes, 8, name)
+	granter, err := NewGranter(cfg, minutes, 8, name)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/authorize", granter.AuthorizationCodeHandler)

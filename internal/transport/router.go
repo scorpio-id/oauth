@@ -1,8 +1,6 @@
 package transport
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"log"
 	"net/http"
 	"runtime"
@@ -15,31 +13,17 @@ import (
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/grants"
 	"github.com/scorpio-id/oauth/internal/tls"
-	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
 // NewRouter creates a new mux router with applied server, oauth, and device grant configurations
 func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
-	// generate an RSA key pair
-	private, err := rsa.GenerateKey(rand.Reader, cfg.OAuth.RSABits)
+	// create a granter
+	name := cfg.Server.Host + ":" + cfg.Server.Port
+	minutes, _ := time.ParseDuration("10m")
+	granter, err := grants.NewGranter(cfg, minutes, 8, name+"/device")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// create a simple oauth2 issuer which contains a JWT signer and matching JWKS
-	// the name provided below becomes the 'iss' claim in minted access tokens
-	// start time determines the 'nbf' claim
-	// the TTL integer determines the lifetime of an access token in seconds
-	// we are using plain http here strictly for example purposes
-	name := cfg.OAuth.Issuer
-	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
-	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
-
-	// create a granter
-	// FIXME update config struct to include the below materials
-	name = cfg.Server.Host + ":" + cfg.Server.Port
-	minutes, _ := time.ParseDuration("10m")
-	granter := grants.NewGranter(cfg, issuer, minutes, 8, name+"/device")
 
 	// create gorilla mux router
 	router := mux.NewRouter()
@@ -53,7 +37,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	)).Methods(http.MethodGet)
 
 	// host oauth2 JWKS endpoint
-	router.HandleFunc(cfg.OAuth.JWKS, issuer.JWKSHandler)
+	router.HandleFunc(cfg.OAuth.JWKS, granter.Issuer.JWKSHandler)
 
 	// host grant endpoints
 	router.HandleFunc("/token", granter.ClientCredentialsHandler).Methods(http.MethodPost, http.MethodOptions)
@@ -90,6 +74,6 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 	// enable CORS 
 	subr.Use(mux.CORSMethodMiddleware(subr))
 
-	return router, &granter
+	return router, granter
 }
 

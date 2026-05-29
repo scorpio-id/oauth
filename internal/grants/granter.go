@@ -1,19 +1,12 @@
 package grants
 
 import (
-	crand "crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
 	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/data"
-	"github.com/scorpio-id/oauth/internal/tls"
 	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
 
@@ -34,16 +27,33 @@ type Granter struct {
 	UserCodeLength     int
 }
 
-func NewGranter(cfg config.Config, issuer oauth2.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
-	return Granter{
+func NewGranter(cfg config.Config, ttl time.Duration, length int, uri string) (*Granter, error) {
+
+	store := data.NewClientStore(cfg)
+
+	private, err := store.LoadKeyPair()
+	if err != nil {
+		return nil, err
+	}
+
+	// create a simple oauth2 issuer which contains a JWT signer and matching JWKS
+	// the name provided below becomes the 'iss' claim in minted access tokens
+	// start time determines the 'nbf' claim
+	// the TTL integer determines the lifetime of an access token in seconds
+	// we are using plain http here strictly for example purposes
+	name := cfg.OAuth.Issuer
+	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
+	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
+
+	return &Granter{
 		Issuer:           issuer,
-		ClientStore:      data.NewClientStore(cfg),
+		ClientStore:      store,
 		InteractionStore: data.NewInteractionStore(),
 		CodeTTL:          ttl,
 		VerificationURI:  uri,
 		UserCodeLength:   length,
 		Type:             TYPE,
-	}
+	}, nil
 }
 
 // TODO - implement separate types of interactions for different grants
@@ -103,63 +113,6 @@ func (g *Granter) AuthorizeClient(client string, code string) error {
 // IsTrustedDevice returns true iff there exists at least one trusted device with matching client_id and device_code
 func (g *Granter) IsTrustedDevice(device string, client string) bool {
 	return g.TrustedDeviceStore.Contains(device, client)
-}
-
-// FIXME this should load a PKCS12 and unpack the byte contents (see tls.go)
-func (g *Granter) ObtainWebServerIdentity(cfg config.Config) (*rsa.PrivateKey, []byte, error) {
-	if cfg.Persistence.Enabled {
-		private, webcert, err := g.ClientStore.LoadWebX509AndPrivateKey()
-
-		// persistence is enabled, but no web cert has been generated yet
-		if err == redis.Nil {
-			fmt.Println("persistence enabled, but no web private key, x509 found. generating ...")
-			private, err = rsa.GenerateKey(crand.Reader, cfg.OAuth.RSABits)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// TODO replace with tls.GetCert()
-			webcert, err := tls.RetrieveTLSCertificate(cfg)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			// FIXME save certs to persistence, move to function?
-			content, err := x509.ParseCertificate(webcert)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			err = g.ClientStore.Persist.SetX509(content)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			err = g.ClientStore.Persist.SetRSAKeyPair(private)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-		} else if err != nil {
-			log.Fatal(err)
-		}
-
-		return private, webcert, err
-	}
-
-	// If persistence is turned off create new keys and certificates from scratch
-	private, err := rsa.GenerateKey(crand.Reader, cfg.OAuth.RSABits)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// TODO use tls.GetCert()
-	webcert, err := tls.RetrieveTLSCertificate(cfg)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return private, webcert, err
 }
 
 func (g *Granter) generateDeviceCode() string {
