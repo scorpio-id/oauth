@@ -46,8 +46,7 @@ func NewRouter(cfg config.Config) (*mux.Router, *grants.Granter) {
 
 	// check if TLS is enabled, if so create cert client and serialize x509 if on linux OS
 	if runtime.GOOS == "linux" {
-		// TODO replace with granter.ObtainWebServerIdentity()
-		content, err := tls.RetrieveTLSCertificate(cfg)
+		content, err := granter.ClientStore.LoadWebPKCS12()
 		if err != nil {
 			log.Fatal(err)
 		}
