@@ -79,9 +79,6 @@ func (store *ClientStore) LoadWebPKCS12() ([]byte, error) {
 	}
 
 	pkcs, err := store.Persist.GetPKCS12()
-	if err != nil {
-		return nil, err
-	}
 
 	// case: persistence is enabled, but PKCS12 does not exist
 	if err == redis.Nil {
@@ -94,6 +91,10 @@ func (store *ClientStore) LoadWebPKCS12() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+	
+	if err != nil {
+		return nil, err
 	}
 
 	return pkcs, nil
