@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -66,10 +67,11 @@ func RetrieveTLSCertificate(cfg config.Config) ([]byte, error) {
 	spnegocl := spnego.NewClient(cl, httpclient, "HTTP/ca.scorpio.ordinarycomputing.com")
 	response, err := spnegocl.Do(r)
 	if err != nil {
+		log.Default().Print(err.Error())
 		return nil, err
 	}
 
-	fmt.Println("status: " + response.Status)
+	fmt.Println("PKI HTTP Status: " + response.Status)
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err

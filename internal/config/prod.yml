@@ -1,0 +1,34 @@
+# server configurations
+server:
+  host: "http://127.0.0.1"
+  port: 8082
+
+# redis configurations
+persistence:
+  enabled: false
+  host: "db-valkey-nyc1-scorpio-do-user-16782644-0.l.db.ondigitalocean.com"
+  port: 25061
+  user: "default"
+  path: "/etc/scorpio-secret/password"
+  database: 1
+
+# oauth configurations
+oauth:
+  rsa_bits: 2048
+  audience: "important-resource-server"
+  issuer: "https://oauth.scorpio.ordinarycomputing.com:8082"
+  jwt_ttl: "1h"
+  jwks: "/jwks"
+
+# SPNEGO configurations
+spnego:
+  realm: "KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  service_principal_name: "scorpio-oauth"
+  password: "move-to-kube-secrets-1111"
+
+# PKI configuration
+pki:
+  endpoint: "http://ca.scorpio.ordinarycomputing.com:8081/spnego"
+  service_principal_name: "HTTP/ca.scorpio.ordinarycomputing.com@KRB.SCORPIO.ORDINARYCOMPUTING.COM"
+  sans:
+    - "oauth.scorpio.ordinarycomputing.com"
