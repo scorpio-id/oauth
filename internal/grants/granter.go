@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/scorpio-id/oauth/internal/config"
 	"github.com/scorpio-id/oauth/internal/data"
 	"github.com/scorpio-id/oauth/pkg/oauth2"
 )
@@ -26,16 +27,33 @@ type Granter struct {
 	UserCodeLength     int
 }
 
-func NewGranter(issuer oauth2.SimpleIssuer, ttl time.Duration, length int, uri string) Granter {
-	return Granter{
+func NewGranter(cfg config.Config, ttl time.Duration, length int, uri string) (*Granter, error) {
+
+	store := data.NewClientStore(cfg)
+
+	private, err := store.LoadKeyPair()
+	if err != nil {
+		return nil, err
+	}
+
+	// create a simple oauth2 issuer which contains a JWT signer and matching JWKS
+	// the name provided below becomes the 'iss' claim in minted access tokens
+	// start time determines the 'nbf' claim
+	// the TTL integer determines the lifetime of an access token in seconds
+	// we are using plain http here strictly for example purposes
+	name := cfg.OAuth.Issuer
+	hour, _ := time.ParseDuration(cfg.OAuth.TokenTTL)
+	issuer := oauth2.NewSimpleIssuer(private, name+cfg.OAuth.JWKS, cfg.OAuth.Audience, time.Now(), hour)
+
+	return &Granter{
 		Issuer:           issuer,
-		ClientStore:      data.NewClientStore(),
+		ClientStore:      store,
 		InteractionStore: data.NewInteractionStore(),
 		CodeTTL:          ttl,
 		VerificationURI:  uri,
 		UserCodeLength:   length,
 		Type:             TYPE,
-	}
+	}, nil
 }
 
 // TODO - implement separate types of interactions for different grants

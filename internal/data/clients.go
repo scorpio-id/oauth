@@ -1,11 +1,22 @@
 package data
 
-import "sync"
+import (
+	"crypto/rand"
+	"crypto/rsa"
+	"sync"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/scorpio-id/oauth/internal/config"
+	"github.com/scorpio-id/oauth/internal/tls"
+)
 
 // ClientStore acts as a simple in-memory client id datastore
 type ClientStore struct {
-	IDs []ClientID   `json:"clients"`
-	mu  sync.RWMutex `json:"-"`
+	IDs     []ClientID   `json:"clients"`
+	Persist Persistence
+	
+	// WARNING: this was converted from literal to pointer value
+	mu      *sync.RWMutex
 }
 
 // ClientID represents an OAuth Client Identifier (user or application, created via registration)
@@ -19,12 +30,17 @@ type ClientID struct {
 	Authorizations        map[string]string `json:"authorizations"`
 }
 
-func NewClientStore() ClientStore {
+func NewClientStore(cfg config.Config) ClientStore {
 	return ClientStore{
 		IDs: make([]ClientID, 0),
+		Persist: NewPersistenceClient(cfg),
+
+		// WARNING: this was converted from literal to pointer value
+		mu: &sync.RWMutex{},
 	}
 }
 
+// FIXME ensure client added is unique
 func (c *ClientStore) Add(id ClientID) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -55,4 +71,61 @@ func (c *ClientStore) Contains(id string) bool {
 	}
 
 	return false
+}
+
+func (store *ClientStore) LoadWebPKCS12() ([]byte, error) {
+	if !store.Persist.cfg.Persistence.Enabled {
+		return tls.RetrieveTLSCertificate(store.Persist.cfg)
+	}
+
+	pkcs, err := store.Persist.GetPKCS12()
+
+	// case: persistence is enabled, but PKCS12 does not exist
+	if err == redis.Nil {
+		pkcs, err := tls.RetrieveTLSCertificate(store.Persist.cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		err = store.Persist.SetPKCS12(pkcs)
+		if err != nil {
+			return nil, err
+		}
+	}
+	
+	if err != nil {
+		return nil, err
+	}
+
+	return pkcs, nil
+}
+
+// FIXME this should clearly load the key pair used by the granter to sign JWTs
+func (store *ClientStore) LoadKeyPair() (*rsa.PrivateKey, error) {
+	if !store.Persist.cfg.Persistence.Enabled {
+		return rsa.GenerateKey(rand.Reader, store.Persist.cfg.OAuth.RSABits)
+	}
+
+	stored, err := store.Persist.GetSigningRSAKeyPair()
+
+	// case: key doesn't exist in persistence store
+	if err == redis.Nil {
+		// start by creating a RSA public/private key pair
+		private, err := rsa.GenerateKey(rand.Reader, store.Persist.cfg.OAuth.RSABits)
+		if err != nil {
+			return nil, err
+		}
+
+		err = store.Persist.SetSigningRSAKeyPair(private)
+		if err != nil {
+			return nil, err
+		}
+
+		return private, nil
+
+	} else if err != nil {
+		return nil, err
+	}
+
+	return stored, nil
 }
